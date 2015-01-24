@@ -1,1 +1,40 @@
 //Fichier principal\\
+# -*- coding: utf8 -*-
+
+import pygame
+from pygame.locals import *
+pygame.init()
+#Ouverture de la fenêtre Pygame
+fenetre = pygame.display.set_mode((600, 800))
+#Chargement et collage du fond
+fond = pygame.image.load("background1.jpg").convert()
+fenetre.blit(fond, (0,0))
+#Rafraîchissement de l'écran
+pygame.display.flip()
+
+
+cordonneex=268
+cordonneey=736
+Vaisseau = pygame.image.load("Vaisseau.png").convert_alpha()
+fenetre.blit(Vaisseau,(cordonneex,cordonneey))
+pygame.display.flip()
+
+pygame.key.set_repeat(1,10)
+
+continuer = 1
+#Boucle infinie
+while continuer:
+    for event in pygame.event.get():   #On parcours la liste de tous les événements reçus
+        if event.type == QUIT:     #Si un de ces événements est de type QUIT
+            continuer = 0      #On arrête la boucle
+        elif event.type == KEYDOWN and event.key == K_d:
+            fenetre.blit(fond, (0,0))
+            cordonneex+=4
+            fenetre.blit(Vaisseau,(cordonneex,cordonneey))
+            pygame.display.flip()
+        elif event.type == KEYDOWN and event.key == K_a:
+            fenetre.blit(fond, (0,0))
+            cordonneex+=-4
+            fenetre.blit(Vaisseau,(cordonneex,cordonneey))
+            pygame.display.flip()    
+            
