@@ -19,7 +19,7 @@ Vaisseau = pygame.image.load("Vaisseau.png").convert_alpha()
 fenetre.blit(Vaisseau,(cordonneex,cordonneey))
 pygame.display.flip()
 
-pygame.key.set_repeat(1,10)
+pygame.key.set_repeat(3,5)
 
 continuer = 1
 #Boucle infinie
