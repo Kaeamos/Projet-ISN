@@ -27,6 +27,8 @@ try:
     pygame.key.set_repeat(3,5) 
     pygame.display.flip()
     continuer=1
+
+    execute=0
     
     timer=pygame.time.Clock()
     temps=-500
@@ -37,8 +39,7 @@ try:
             self.pos = image.get_rect().move(x, hauteur)
         def move(self):
             self.pos = self.pos.move(0, self.vitesse)
-            if self.pos.top > 736:
-                self.pos.left = 0
+            
     
     while continuer:
         for event in pygame.event.get():
@@ -53,13 +54,14 @@ try:
                     if Vaisseau_rect.left<0:
                         #On empêche le vaisseau de sortir de la fenêtre
                         Vaisseau_rect.left=0
-                if event.key==K_d:
+                elif event.key==K_d:
                     Vaisseau_rect=Vaisseau_rect.move(5,0)
                     if Vaisseau_rect.right>600:
                         Vaisseau_rect.right=600
                         #On empêche le vaisseau de sortir de la fenêtre
-                if event.key==K_w:
+                elif event.key==K_w:
                     if pygame.time.get_ticks()>= temps+500:
+                        execute=1
                         temps=pygame.time.get_ticks()
                         print("Appuyé sur z")
                         o = objet(tir,736, -10,Vaisseau_rect.left +32)
@@ -68,14 +70,18 @@ try:
         fenetre.blit(fond, (0,0))
         for o in liste_tir:
             o.move()
+            if o.pos.top <= 16:
+                liste_tir=liste_tir[1:]
+                print("patate")
             fenetre.blit(o.image, o.pos)
-            
-        fenetre.blit(Vaisseau,Vaisseau_rect)
-        pygame.display.flip()
+        fenetre.blit(Vaisseau,Vaisseau_rect)    
+        pygame.display.update()
         clock=timer.tick(1000) #Limite les FPS à 60
-        print("update")
+        
 except:
     traceback.print_exc()
 finally:
     pygame.quit()
     exit()
+
+
