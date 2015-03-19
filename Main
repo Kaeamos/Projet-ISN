@@ -30,7 +30,6 @@ try:
     
     timer=pygame.time.Clock()
     temps=-500
-
     class objet:
         def __init__(self, image, hauteur, vitesse,x):
             self.vitesse = vitesse
@@ -66,19 +65,11 @@ try:
                         o = objet(tir,736, -10,Vaisseau_rect.left +32)
                         liste_tir.append(o)
 
-                        
-                       
-        for o in liste_tir:
-            fenetre.blit(fond, o.pos, o.pos)
-                    
+        fenetre.blit(fond, (0,0))
         for o in liste_tir:
             o.move()
             fenetre.blit(o.image, o.pos)
-            pygame.display.update()
-                    
-                    
-
-        fenetre.blit(fond, (0,0))
+            
         fenetre.blit(Vaisseau,Vaisseau_rect)
         pygame.display.flip()
         clock=timer.tick(1000) #Limite les FPS à 60
