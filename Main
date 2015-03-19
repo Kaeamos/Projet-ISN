@@ -30,8 +30,7 @@ try:
     
     timer=pygame.time.Clock()
     temps=-500
-    def mouvement_tir(x):
-        return x+10
+
     class objet:
         def __init__(self, image, hauteur, vitesse,x):
             self.vitesse = vitesse
