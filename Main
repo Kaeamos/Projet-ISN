@@ -7,8 +7,11 @@ from random import *
 pygame.init()
 
 try:
+    
     #Ouverture de la fenêtre Pygame
     fenetre=pygame.display.set_mode((600,800))
+    #test TEST test
+    rouge=pygame.image.load("rouge.png").convert_alpha()
     #Chargement et collage du fond
     fond = pygame.image.load("img/background1.jpg").convert()
     fenetre.blit(fond, (0,0))
@@ -41,6 +44,12 @@ try:
     pygame.display.flip()
     continuer=1
 
+    #On initialise la liste des Hitbox des mobs ET des tirs et de leurs suppressions
+    liste_rect_tir=[]
+    liste_rect_mob=[]
+    liste_mob_supr=[]
+    liste_tir_supr=[]
+
     
     keys = [False, False, False]
     
@@ -52,6 +61,7 @@ try:
             self.vitesse = vitesse
             self.image = image
             self.pos = image.get_rect().move(x, hauteur)
+            
         def move(self):
             self.pos = self.pos.move(0, self.vitesse)
             
@@ -108,21 +118,58 @@ try:
 
 
         fenetre.blit(fond, (0,0))
-        
         #Mouvement des mobs
+        liste_rect_mob=[]
+        liste_mob_supr=[]
         for i in liste_mob:
             i.move()
+            liste_rect_mob.append(i.pos)
+            
+            
             if i.pos.top >= 768:
-                liste_mob=liste_mob[1:]
+               
+            
+               liste_mob=liste_mob[1:]
+            
+
+            
+        #Mouvement des tirs
+        liste_rect_tir=[]
+        liste_tir_supr=[]
+        for o in liste_tir:
+            o.move()
+            liste_rect_tir.append(o.pos)
+            
+            if o.pos.top <= 16:
+                
+                liste_tir=liste_tir[1:]
+            
+        for j in range (0,len(liste_rect_tir) ):
+            hit = liste_rect_tir[j].collidelist(liste_rect_mob)
+            if hit != -1:
+                print("hit")
+                liste_tir_supr.append(j)
+                liste_mob_supr.append(hit)
+        for k in range(0,len(liste_tir_supr)):
+             
+             liste_tir[liste_tir_supr[k]]=-42
+             liste_tir.remove(-42)
+            
+        for l in range(0,len(liste_mob_supr)):
+             liste_mob[liste_mob_supr[l]]=-42
+             liste_mob.remove(-42)
+
+
+        for o in liste_tir:
+            fenetre.blit(o.image, o.pos)
+            
+        for i in liste_mob:
+            
             fenetre.blit(i.image, i.pos)
             
 
-        #Mouvement des tirs
-        for o in liste_tir:
-            o.move()
-            if o.pos.top <= 16:
-                liste_tir=liste_tir[1:]
-            fenetre.blit(o.image, o.pos)
+        
+
         fenetre.blit(Vaisseau,Vaisseau_rect)    
         pygame.display.update()
         clock=timer.tick(60) #Limite les FPS à 60
