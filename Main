@@ -56,6 +56,8 @@ try:
     liste_tir_supr=[]
     #On défini le nombre de vie de base
     vie = 3
+    #On charge les bruitages
+    pygame.mixer.music.load("sound/laser.mp3")
     
     keys = [False, False, False]
     
@@ -104,7 +106,9 @@ try:
                 Vaisseau_rect.right=600
                 #On empêche le vaisseau de sortir de la fenêtre
         if keys[2]:
-            if pygame.time.get_ticks()>= temps+500:                        
+            if pygame.time.get_ticks()>= temps+500:
+                    pygame.mixer.music.set_volume(0.1)
+                    pygame.mixer.music.play()
                     temps=pygame.time.get_ticks()
                     o = objet(tir,736, -10,Vaisseau_rect.left +32)
                     liste_tir.append(o)
@@ -130,78 +134,3 @@ try:
             position_mob = randrange(20,516,65)
             monstre= objet(image_mob,0,3,position_mob)
             liste_mob.append(monstre)
-
-
-        fenetre.blit(fond, (0,0))
-        #Mouvement des mobs
-        liste_rect_mob=[]
-        liste_mob_supr=[]
-        for i in liste_mob:
-            i.move()
-            liste_rect_mob.append(i.pos)
-            
-            
-            if i.pos.top >= 768:
-               vie=vie-1
-            
-               liste_mob=liste_mob[1:]
-            
-
-            
-        #Mouvement des tirs
-        liste_rect_tir=[]
-        liste_tir_supr=[]
-        for o in liste_tir:
-            o.move()
-            liste_rect_tir.append(o.pos)
-            
-            if o.pos.top <= 16:
-                
-                liste_tir=liste_tir[1:]
-        #calcul des hitboxs
-            
-        for j in range (0,len(liste_rect_tir) ):
-            hit = liste_rect_tir[j].collidelist(liste_rect_mob)
-            if hit != -1:
-                liste_tir_supr.append(j) #on ajoute les coordonnées de la collision dans une liste a traiter plus tard
-                liste_mob_supr.append(hit)#idem
-
-        hit = Vaisseau_rect.collidelist(liste_rect_mob)
-        if hit != -1:
-            vie = vie -1 #on enlève une vie
-            liste_mob_supr.append(hit)#idem
-        #On supprime les tirs entré en contact avec les mobs
-
-        for k in range(0,len(liste_tir_supr)):
-             
-             liste_tir[liste_tir_supr[k]]=-42
-             liste_tir.remove(-42)
-        #On supprime les mobs entré en contact avec les tirs
-        for l in range(0,len(liste_mob_supr)):
-             liste_mob[liste_mob_supr[l]]=-42
-             liste_mob.remove(-42)
-
-        #On affiche tir et mobs à l'écran
-        for o in liste_tir:
-            fenetre.blit(o.image, o.pos)
-            
-        for i in liste_mob:
-            
-            fenetre.blit(i.image, i.pos)
-            
-        if vie >= 3:
-            fenetre.blit(heart, (580,780))
-        if vie >= 2:
-            fenetre.blit(heart, (555,780))
-        if vie >= 1:
-            fenetre.blit(heart, (530,780))
-        
-        fenetre.blit(Vaisseau,Vaisseau_rect)    
-        pygame.display.update()
-        clock=timer.tick(60) #Limite les FPS à 60
-        
-except:
-    traceback.print_exc()
-finally:
-    pygame.quit()
-    exit()
