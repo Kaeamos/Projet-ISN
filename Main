@@ -32,6 +32,8 @@ try:
     mob3=pygame.image.load("img/mob3.png").convert_alpha()
     mob3_rect=mob3.get_rect()
 
+    image_fastmob=pygame.image.load("img/fastmob.png").convert_alpha()
+    image_fastmob_rect=image_fastmob.get_rect()
     #Chargement des Coeurs
     heart=pygame.image.load("img/HP.png").convert_alpha()
 
@@ -59,7 +61,8 @@ try:
     
     timer=pygame.time.Clock()
     temps=-500
-    tps=-500
+    tps_mob=-500
+    tps_fastmob=-500
     class objet:
         def __init__(self, image, hauteur, vitesse,x):
             self.vitesse = vitesse
@@ -106,8 +109,17 @@ try:
                     o = objet(tir,736, -10,Vaisseau_rect.left +32)
                     liste_tir.append(o)
 
-        if pygame.time.get_ticks()>=5000 and pygame.time.get_ticks()>=tps+1000:
-            tps=pygame.time.get_ticks()
+        #Spawn des mobs
+        #Spawn du mob rapide
+        if pygame.time.get_ticks()>=15000 and pygame.time.get_ticks()>tps_fastmob+5000:
+            tps_fastmob=pygame.time.get_ticks()
+            position_mob = randrange(20,516,42)
+            monstre = objet(image_fastmob,0,5,position_mob)
+            liste_mob.append(monstre)
+
+        #Spawn des mobs classiques
+        if pygame.time.get_ticks()>=5000 and pygame.time.get_ticks()>=tps_mob+1200:
+            tps_mob=pygame.time.get_ticks()
             random_image_mob=randrange(1,6,1)
             if random_image_mob==1:  
                 image_mob = mob1
@@ -184,7 +196,6 @@ try:
         if vie >= 1:
             fenetre.blit(heart, (530,780))
         
-
         fenetre.blit(Vaisseau,Vaisseau_rect)    
         pygame.display.update()
         clock=timer.tick(60) #Limite les FPS à 60
