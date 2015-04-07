@@ -31,7 +31,10 @@ try:
 
     mob3=pygame.image.load("img/mob3.png").convert_alpha()
     mob3_rect=mob3.get_rect()
-    
+
+    #Chargement des Coeurs
+    heart=pygame.image.load("img/HP.png").convert_alpha()
+
     #Chargement du tir
     tir=pygame.image.load("img/tir.png").convert_alpha()
     tir_rect=tir.get_rect()
@@ -174,7 +177,12 @@ try:
             
             fenetre.blit(i.image, i.pos)
             
-
+        if vie >= 3:
+            fenetre.blit(heart, (580,780))
+        if vie >= 2:
+            fenetre.blit(heart, (555,780))
+        if vie >= 1:
+            fenetre.blit(heart, (530,780))
         
 
         fenetre.blit(Vaisseau,Vaisseau_rect)    
