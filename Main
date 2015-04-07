@@ -10,8 +10,7 @@ try:
     
     #Ouverture de la fenêtre Pygame
     fenetre=pygame.display.set_mode((600,800))
-    #test TEST test
-    rouge=pygame.image.load("rouge.png").convert_alpha()
+    
     #Chargement et collage du fond
     fond = pygame.image.load("img/background1.jpg").convert()
     fenetre.blit(fond, (0,0))
@@ -22,6 +21,171 @@ try:
     Vaisseau_rect.top=736
     
     fenetre.blit(Vaisseau,Vaisseau_rect)
+    #Chargement des sprites de mobs
+    mob1=pygame.image.load("img/mob1.png").convert_alpha()
+    mob1_rect=mob1.get_rect()
+
+    mob2=pygame.image.load("img/mob2.png").convert_alpha()
+    mob2_rect=mob2.get_rect()
+
+    mob3=pygame.image.load("img/mob3.png").convert_alpha()
+    mob3_rect=mob3.get_rect()
+    
+    #Chargement du tir
+    tir=pygame.image.load("img/tir.png").convert_alpha()
+    tir_rect=tir.get_rect()
+    #on crée des listes qui contiendront les coordonnées du tir et des mobs
+    liste_tir =[]
+    liste_mob =[]
+    
+    #On active la répétition des touches
+    pygame.key.set_repeat(3,5) 
+    pygame.display.flip()
+    
+
+    #On initialise la liste des Hitbox des mobs ET des tirs et de leurs suppressions
+    liste_rect_tir=[]
+    liste_rect_mob=[]
+    liste_mob_supr=[]
+    liste_tir_supr=[]
+    #On défini le nombre de vie de base
+    vie = 3
+    
+    keys = [False, False, False]
+    
+    timer=pygame.time.Clock()
+    temps=-500
+    tps=-500
+    class objet:
+        def __init__(self, image, hauteur, vitesse,x):
+            self.vitesse = vitesse
+            self.image = image
+            self.pos = image.get_rect().move(x, hauteur)
+            
+        def move(self):
+            self.pos = self.pos.move(0, self.vitesse)
+            
+    
+    while vie !=0:
+        for event in pygame.event.get():
+            #moyen pour sortir de la boucle
+            if event.type==QUIT:
+                continuer=0 
+            if event.type==KEYDOWN:
+                if event.key==K_a:
+                    keys[0]=True           
+                if event.key==K_d:
+                    keys[1]=True     
+                if event.key==K_w:
+                    keys[2]=True                   
+            if event.type==KEYUP: 
+                if event.key==K_a:
+                    keys[0]=False
+                if event.key==K_d:
+                    keys[1]=False
+                if event.key==K_w:
+                    keys[2]=False
+        if keys[0]:
+            Vaisseau_rect=Vaisseau_rect.move(-7,0)
+            #on déplace le rectangle de l'image de 5 pixel vers la gauche
+            if Vaisseau_rect.left<0:
+                #On empêche le vaisseau de sortir de la fenêtre
+                Vaisseau_rect.left=0
+        if keys[1]:
+            Vaisseau_rect=Vaisseau_rect.move(7,0)
+            if Vaisseau_rect.right>600:
+                Vaisseau_rect.right=600
+                #On empêche le vaisseau de sortir de la fenêtre
+        if keys[2]:
+            if pygame.time.get_ticks()>= temps+500:                        
+                    temps=pygame.time.get_ticks()
+                    o = objet(tir,736, -10,Vaisseau_rect.left +32)
+                    liste_tir.append(o)
+
+        if pygame.time.get_ticks()>=5000 and pygame.time.get_ticks()>=tps+1000:
+            tps=pygame.time.get_ticks()
+            random_image_mob=randrange(1,6,1)
+            if random_image_mob==1:  
+                image_mob = mob1
+            elif random_image_mob >1 and random_image_mob <4:
+                image_mob = mob2
+            else:
+                image_mob = mob3
+            position_mob = randrange(20,516,65)
+            monstre= objet(image_mob,0,3,position_mob)
+            liste_mob.append(monstre)
+
+
+        fenetre.blit(fond, (0,0))
+        #Mouvement des mobs
+        liste_rect_mob=[]
+        liste_mob_supr=[]
+        for i in liste_mob:
+            i.move()
+            liste_rect_mob.append(i.pos)
+            
+            
+            if i.pos.top >= 768:
+               vie=vie-1
+            
+               liste_mob=liste_mob[1:]
+            
+
+            
+        #Mouvement des tirs
+        liste_rect_tir=[]
+        liste_tir_supr=[]
+        for o in liste_tir:
+            o.move()
+            liste_rect_tir.append(o.pos)
+            
+            if o.pos.top <= 16:
+                
+                liste_tir=liste_tir[1:]
+        #calcul des hitboxs
+            
+        for j in range (0,len(liste_rect_tir) ):
+            hit = liste_rect_tir[j].collidelist(liste_rect_mob)
+            if hit != -1:
+                liste_tir_supr.append(j) #on ajoute les coordonnées de la collision dans une liste a traiter plus tard
+                liste_mob_supr.append(hit)#idem
+
+        hit = Vaisseau_rect.collidelist(liste_rect_mob)
+        if hit != -1:
+            vie = vie -1 #on enlève une vie
+            liste_mob_supr.append(hit)#idem
+        #On supprime les tirs entré en contact avec les mobs
+
+        for k in range(0,len(liste_tir_supr)):
+             
+             liste_tir[liste_tir_supr[k]]=-42
+             liste_tir.remove(-42)
+        #On supprime les mobs entré en contact avec les tirs
+        for l in range(0,len(liste_mob_supr)):
+             liste_mob[liste_mob_supr[l]]=-42
+             liste_mob.remove(-42)
+
+        #On affiche tir et mobs à l'écran
+        for o in liste_tir:
+            fenetre.blit(o.image, o.pos)
+            
+        for i in liste_mob:
+            
+            fenetre.blit(i.image, i.pos)
+            
+
+        
+
+        fenetre.blit(Vaisseau,Vaisseau_rect)    
+        pygame.display.update()
+        clock=timer.tick(60) #Limite les FPS à 60
+        
+except:
+    traceback.print_exc()
+finally:
+    pygame.quit()
+    exit()
+
     #Chargement des sprites de mobs
     mob1=pygame.image.load("img/mob1.png").convert_alpha()
     mob1_rect=mob1.get_rect()
