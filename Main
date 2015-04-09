@@ -34,6 +34,13 @@ try:
 
     image_fastmob=pygame.image.load("img/fastmob.png").convert_alpha()
     image_fastmob_rect=image_fastmob.get_rect()
+
+    image_shooter=pygame.image.load("img/shooter.png").convert_alpha()
+    image_shooter_rect=image_shooter.get_rect()
+    
+    image_shot=pygame.image.load("img/shooter_tir.png").convert_alpha()
+    image_shot_rect=image_shot.get_rect()
+    
     #Chargement des Coeurs
     heart=pygame.image.load("img/HP.png").convert_alpha()
 
@@ -43,6 +50,7 @@ try:
     #on crée des listes qui contiendront les coordonnées du tir et des mobs
     liste_tir =[]
     liste_mob =[]
+    liste_shot =[]
     
     #On active la répétition des touches
     pygame.key.set_repeat(3,5) 
@@ -52,8 +60,11 @@ try:
     #On initialise la liste des Hitbox des mobs ET des tirs et de leurs suppressions
     liste_rect_tir=[]
     liste_rect_mob=[]
+    liste_rect_shot=[]
+    liste_shot_supr=[]
     liste_mob_supr=[]
     liste_tir_supr=[]
+    
     #On défini le nombre de vie de base
     vie = 3
     #On charge les bruitages
@@ -65,6 +76,7 @@ try:
     temps=-500
     tps_mob=-500
     tps_fastmob=-500
+    tps_shooter=-500
     class objet:
         def __init__(self, image, hauteur, vitesse,x):
             self.vitesse = vitesse
@@ -114,6 +126,14 @@ try:
                     liste_tir.append(o)
 
         #Spawn des mobs
+        #Spawn du tireur
+        if pygame.time.get_ticks()>=100 and pygame.time.get_ticks()>tps_shooter+10000:
+            tps_shooter=pygame.time.get_ticks()
+            position_mob = randrange(20,516,42)
+            monstre = objet(image_shooter,0,1,position_mob)
+            liste_mob.append(monstre)
+            shooter_shot = objet(image_shot,0,4,position_mob+45)
+            liste_shot.append(shooter_shot)
         #Spawn du mob rapide
         if pygame.time.get_ticks()>=15000 and pygame.time.get_ticks()>tps_fastmob+5000:
             tps_fastmob=pygame.time.get_ticks()
@@ -155,6 +175,11 @@ try:
         #Mouvement des tirs
         liste_rect_tir=[]
         liste_tir_supr=[]
+        for c in liste_shot:
+            c.move()
+            liste_rect_shot.append(c.pos)
+            if c.pos.top >= 770:
+                liste_shot=liste_shot[1:]
         for o in liste_tir:
             o.move()
             liste_rect_tir.append(o.pos)
@@ -163,12 +188,20 @@ try:
                 
                 liste_tir=liste_tir[1:]
         #calcul des hitboxs
-            
+        #On regarde si il y a collision entre le vaisseau et un tir ennemi
+        hit = Vaisseau_rect.collidelist(liste_rect_shot)
+        if hit != -1:
+            vie = vie - 1
+            liste_shot_rect=[]
+            liste_shot=[]
+        #Si il y a collision, le tir ennemi est supprimé
+
+        
         for j in range (0,len(liste_rect_tir) ):
             hit = liste_rect_tir[j].collidelist(liste_rect_mob)
             if hit != -1:
                 liste_tir_supr.append(j) #on ajoute les coordonnées de la collision dans une liste a traiter plus tard
-                liste_mob_supr.append(hit)#idem
+                liste_mob_supr.append(hit) #idem
 
         hit = Vaisseau_rect.collidelist(liste_rect_mob)
         if hit != -1:
@@ -178,8 +211,8 @@ try:
 
         for k in range(0,len(liste_tir_supr)):
              
-             liste_tir[liste_tir_supr[k]]=-42
-             liste_tir.remove(-42)
+             liste_tir[liste_tir_supr[k]]=-5
+             liste_tir.remove(-5)
         #On supprime les mobs entré en contact avec les tirs
         for l in range(0,len(liste_mob_supr)):
              liste_mob[liste_mob_supr[l]]=-42
@@ -190,8 +223,9 @@ try:
             fenetre.blit(o.image, o.pos)
             
         for i in liste_mob:
-            
             fenetre.blit(i.image, i.pos)
+        for b in liste_shot:
+            fenetre.blit(b.image, b.pos)
             
         if vie >= 3:
             fenetre.blit(heart, (580,780))
