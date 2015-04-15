@@ -4,9 +4,11 @@ import pygame
 from pygame.locals import *
 import traceback
 from random import *
+pygame.mixer.pre_init(44100, -16, 2, 2048)
 pygame.init()
+continuer=1
+while continuer==1:
 
-try:
     
     #Ouverture de la fenêtre Pygame
     fenetre=pygame.display.set_mode((600,800))
@@ -14,6 +16,7 @@ try:
     #Chargement et collage du fond
     fond = pygame.image.load("img/background1.jpg").convert()
     fenetre.blit(fond, (0,0))
+    GameOver= pygame.image.load("img/GameOver.png").convert_alpha()
     #Chargement et collage du vaisseau
     Vaisseau=pygame.image.load("img/Vaisseau.png").convert_alpha()
     Vaisseau_rect=Vaisseau.get_rect()
@@ -51,10 +54,11 @@ try:
     liste_tir =[]
     liste_mob =[]
     liste_shot =[]
+
     
     #On active la répétition des touches
     pygame.key.set_repeat(3,5) 
-    pygame.display.flip()
+    
     
 
     #On initialise la liste des Hitbox des mobs ET des tirs et de leurs suppressions
@@ -68,15 +72,17 @@ try:
     #On défini le nombre de vie de base
     vie = 3
     #On charge les bruitages
-    pygame.mixer.music.load("sound/laser.mp3")
+    laser = pygame.mixer.Sound("sound/laser.wav")
+    mort = pygame.mixer.Sound("sound/mort.wav")
     
     keys = [False, False, False]
     
     timer=pygame.time.Clock()
-    temps=-500
-    tps_mob=-500
-    tps_fastmob=-500
-    tps_shooter=-500
+    
+    temps=pygame.time.get_ticks()
+    tps_mob=pygame.time.get_ticks()
+    tps_fastmob=pygame.time.get_ticks()
+    tps_shooter=pygame.time.get_ticks()
     class objet:
         def __init__(self, image, hauteur, vitesse,x):
             self.vitesse = vitesse
@@ -91,7 +97,8 @@ try:
         for event in pygame.event.get():
             #moyen pour sortir de la boucle
             if event.type==QUIT:
-                continuer=0 
+                pygame.quit()
+                exit()
             if event.type==KEYDOWN:
                 if event.key==K_a:
                     keys[0]=True           
@@ -108,7 +115,7 @@ try:
                     keys[2]=False
         if keys[0]:
             Vaisseau_rect=Vaisseau_rect.move(-7,0)
-            #on déplace le rectangle de l'image de 5 pixel vers la gauche
+            #on déplace le rectangle de l'image de 7 pixel vers la gauche
             if Vaisseau_rect.left<0:
                 #On empêche le vaisseau de sortir de la fenêtre
                 Vaisseau_rect.left=0
@@ -119,8 +126,7 @@ try:
                 #On empêche le vaisseau de sortir de la fenêtre
         if keys[2]:
             if pygame.time.get_ticks()>= temps+500:
-                    pygame.mixer.music.set_volume(0.1)
-                    pygame.mixer.music.play()
+                    laser.play()
                     temps=pygame.time.get_ticks()
                     o = objet(tir,736, -10,Vaisseau_rect.left +32)
                     liste_tir.append(o)
@@ -180,6 +186,7 @@ try:
             liste_rect_shot.append(c.pos)
             if c.pos.top >= 770:
                 liste_shot=liste_shot[1:]
+                liste_rect_shot=[]
         for o in liste_tir:
             o.move()
             liste_rect_tir.append(o.pos)
@@ -192,7 +199,7 @@ try:
         hit = Vaisseau_rect.collidelist(liste_rect_shot)
         if hit != -1:
             vie = vie - 1
-            liste_shot_rect=[]
+            liste_rect_shot=[]
             liste_shot=[]
         #Si il y a collision, le tir ennemi est supprimé
 
@@ -237,9 +244,22 @@ try:
         fenetre.blit(Vaisseau,Vaisseau_rect)    
         pygame.display.update()
         clock=timer.tick(60) #Limite les FPS à 60
+    mort.play()
+    fenetre.blit(fond, (0,0))
+    fenetre.blit(GameOver,(0,0))
+    pygame.display.update()
+    
+    wait_replay =0
+    while wait_replay!=1:
+       
+       for event in pygame.event.get():
+            if event.type==KEYDOWN:
+                if event.key==K_SPACE:
+                    wait_replay=1
+                if event.key==K_ESCAPE:
+                    pygame.quit()
+                    exit()
         
-except:
-    traceback.print_exc()
-finally:
-    pygame.quit()
-    exit()
+    
+    
+
