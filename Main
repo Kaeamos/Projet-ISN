@@ -6,7 +6,6 @@ import traceback
 from random import *
 pygame.mixer.pre_init(44100, -16, 2, 2048)
 pygame.init()
-
 continuer=1
 while continuer==1:
 
@@ -14,9 +13,9 @@ while continuer==1:
     #Ouverture de la fenêtre Pygame
     fenetre=pygame.display.set_mode((600,800))
     
-    #Chargement du fond
+    #Chargement et collage du fond
     fond = pygame.image.load("img/background1.jpg").convert()
-    
+    fenetre.blit(fond, (0,0))
     GameOver= pygame.image.load("img/GameOver.png").convert_alpha()
     #Chargement et collage du vaisseau
     Vaisseau=pygame.image.load("img/Vaisseau.png").convert_alpha()
@@ -103,6 +102,7 @@ while continuer==1:
             if i.pos.top >= limite and bas==True and degat ==True:
                vie=vie-1
                liste=liste[1:]
+               
             elif i.pos.top >=limite and bas==True:
                 liste=liste[1:]
             elif i.pos.top <= limite and bas==False and degat==True:
@@ -111,11 +111,40 @@ while continuer==1:
             elif i.pos.top <= limite and bas==False :
                 liste=liste[1:]
         return liste ,liste_rect,vie
+    def Collision(rect,liste_rect,liste,vie,degat=False,rect_liste=False,j= 0,liste_2=[]):
+     liste_supr=[]
+     liste_supr_2=[]
+     hit = rect.collidelist(liste_rect)
+     if hit != -1:
+          liste_supr.append(hit)
+          if rect_liste == True:
+               liste_supr_2.append(j)
+     for l in range(0,len(liste_supr)):
+          liste[liste_supr[l]]=-42
+     for l in range(0,liste.count(-42)):
+          liste.remove(-42)
+          if degat== True:
+               vie=vie-1
+     if rect_liste==True:
+          for l in range(0,len(liste_supr_2)):
+               liste_2[liste_supr_2[l]]=-42
+          for l in range(0,liste_2.count(-42)):
+               liste_2.remove(-42)
+               if degat== True:
+                    vie=vie-1
+          return liste,liste_2,vie
+     else:
+          return liste,vie
+     return liste,vie
+    def Affichage(liste):
+     for o in liste:
+            fenetre.blit(o.image, o.pos)
     class objet:
         def __init__(self, image, hauteur, vitesse,x):
             self.vitesse = vitesse
             self.image = image
             self.pos = image.get_rect().move(x, hauteur)
+            
         def move(self):
             self.pos = self.pos.move(0, self.vitesse)
             
@@ -157,7 +186,6 @@ while continuer==1:
                     temps=pygame.time.get_ticks()
                     o = objet(tir,736, -10,Vaisseau_rect.left +32)
                     liste_tir.append(o)
-
                                         ###Spawn des mobs###
         #Spawn du tireur
         liste_mob,liste_shot,tps_shooter = spawn(100,10000,image_shooter,1,tps_shooter,True)
@@ -173,59 +201,28 @@ while continuer==1:
         else:
             image_mob = mob3
         liste_mob,liste_shot,tps_mob = spawn(5000,1200,image_mob,3,tps_mob)        
+                                      ###Mouvement des mobs###
+
         
-                                        ###MOUVEMENT###
-        #Mouvement des mobs
-        liste_mob_supr=[]
-        liste_mob,liste_rect_mob,vie = Mouvement(liste_mob,liste_rect_mob,768,vie,True)    
-        #Mouvement des tirs
-       
-        liste_tir_supr=[]
-        
+        liste_mob,liste_rect_mob,vie = Mouvement(liste_mob,liste_rect_mob,768,vie,True) 
+                                      ###Mouvement des tirs###      
+        #Tirs enemi
         liste_shot,liste_rect_shot,vie= Mouvement(liste_shot,liste_rect_shot,770,vie)
+        #Tirs allié
         liste_tir,liste_rect_tir,vie = Mouvement(liste_tir,liste_rect_tir,16,vie,False,False)
-                
-        
-                                    ###CALCUL DES HITBOXS###
-        #On regarde si il y a collision entre le vaisseau et un tir ennemi
-        hit = Vaisseau_rect.collidelist(liste_rect_shot)
-        if hit != -1:
-            vie = vie - 1
-            liste_rect_shot=[]
-            liste_shot=[]
-        #Si il y a collision, le tir ennemi est supprimé
-
-        
+                                    ###calcul Collisions###
+        #On regarde si il y a collision entre le vaisseau et un tir ennemi , Si il y a collision, le tir ennemi est supprimé
+        liste_shot,vie=Collision(Vaisseau_rect,liste_rect_shot,liste_shot,vie,True)
+        #On regarde si il y a collision entre le vaisseau et un  ennemi , Si il y a collision, l'ennemi est supprimé
+        liste_mob,vie=Collision(Vaisseau_rect,liste_rect_mob,liste_mob,vie,True)
+        #On regarde si il y a collision en un tir allié et un enemi ,sil il y a collision l'enemi et letirs sont supprimés
         for j in range (0,len(liste_rect_tir) ):
-            hit = liste_rect_tir[j].collidelist(liste_rect_mob)
-            if hit != -1:
-                liste_tir_supr.append(j) #on ajoute les coordonnées de la collision dans une liste a traiter plus tard
-                liste_mob_supr.append(hit) #idem
-
-        hit = Vaisseau_rect.collidelist(liste_rect_mob)
-        if hit != -1:
-            vie = vie -1 #on enlève une vie
-            liste_mob_supr.append(hit)#idem
-        #On supprime les tirs entré en contact avec les mobs
-
-        for k in range(0,len(liste_tir_supr)):
-             
-             liste_tir[liste_tir_supr[k]]=-5
-             liste_tir.remove(-5)
-        #On supprime les mobs entré en contact avec les tirs
-        for l in range(0,len(liste_mob_supr)):
-             liste_mob[liste_mob_supr[l]]=-42
-             liste_mob.remove(-42)
+            liste_mob,liste_tir,vie=Collision(liste_rect_tir[j],liste_rect_mob,liste_mob,vie,False,True,j,liste_tir)
         fenetre.blit(fond, (0,0))
         #On affiche tir et mobs à l'écran
-        for o in liste_tir:
-            fenetre.blit(o.image, o.pos)
-            
-        for i in liste_mob:
-            fenetre.blit(i.image, i.pos)
-        for b in liste_shot:
-            fenetre.blit(b.image, b.pos)
-            
+        Affichage(liste_tir)            
+        Affichage(liste_mob)
+        Affichage(liste_shot)
         if vie >= 3:
             fenetre.blit(heart, (580,780))
         if vie >= 2:
@@ -251,3 +248,7 @@ while continuer==1:
                 if event.key==K_ESCAPE:
                     pygame.quit()
                     exit()
+        
+    
+    
+
