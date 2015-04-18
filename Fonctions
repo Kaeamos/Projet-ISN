@@ -1,0 +1,106 @@
+# -*- coding: utf8 -*-
+import pygame
+from Variable_Init import *
+from random import *
+def spawn (temps_mini,intervalle,image,vitesse,time_since_last_spawn,Shot = False):
+    """Cette fonction fait apparaitre un enemi en fonction des arguments donnés """
+    global liste_mob,image_shot,liste_shot
+    if pygame.time.get_ticks()>=temps_mini+ and pygame.time.get_ticks()>time_since_last_spawn+intervalle:
+        time_since_last_spawn=pygame.time.get_ticks()
+        position_mob = randrange(20,516,42)
+        monstre = objet(image,0,vitesse,position_mob)
+        liste_mob.append(monstre)
+        if Shot == True:
+            shooter_shot = objet(image_shot,0,4,position_mob+45)
+            liste_shot.append(shooter_shot)
+    return liste_mob , liste_shot ,time_since_last_spawn
+
+def Mouvement(liste,liste_rect,limite,vie,degat =False,bas= True):
+    """Cette fonction permet de faire bouger tout les élements à l'écran à l'exception du vaisseau"""
+    liste_rect=[]
+    for i in liste:
+        i.move()
+        liste_rect.append(i.pos)
+        if i.pos.top >= limite and bas==True and degat ==True:
+           vie=vie-1
+           liste=liste[1:]
+           
+        elif i.pos.top >=limite and bas==True:
+            liste=liste[1:]
+        elif i.pos.top <= limite and bas==False and degat==True:
+            vie=vie-1
+            liste=liste[1:]
+        elif i.pos.top <= limite and bas==False :
+            liste=liste[1:]
+    return liste ,liste_rect,vie
+def Collision(rect,liste_rect,liste,vie,degat=False,rect_liste=False,j= 0,liste_2=[]):
+ """Cette fonction permet de calculer les collisions entre des élements et le cas écheant les supprimer"""
+ liste_supr=[]
+ liste_supr_2=[]
+ hit = rect.collidelist(liste_rect)
+ if hit != -1:
+      liste_supr.append(hit)
+      if rect_liste == True:
+           liste_supr_2.append(j)
+ for l in range(0,len(liste_supr)):
+      liste[liste_supr[l]]=-42
+ for l in range(0,liste.count(-42)):
+      liste.remove(-42)
+      if degat== True:
+           vie=vie-1
+ if rect_liste==True:
+      for l in range(0,len(liste_supr_2)):
+           liste_2[liste_supr_2[l]]=-42
+      for l in range(0,liste_2.count(-42)):
+           liste_2.remove(-42)
+           if degat== True:
+                vie=vie-1
+      return liste,liste_2,vie
+ else:
+      return liste,vie
+ return liste,vie
+def Affichage(liste):
+ """Cette fonction permet d'afficher les élements donnés en argument à l'écran"""
+ for o in liste:
+        fenetre.blit(o.image, o.pos)
+def Init():
+    """Fonction qui remets les valeurs initiales des différents elements avant chaque partie"""
+    global Vaisseau_rect,liste_tir,liste_mob,liste_shot,liste_rect_tir,liste_rect_mob,liste_rect_shot
+    global liste_mob_supr,liste_tir_supr,vie,keys,timer,temps,tps_mob,tps_fastmob,tps_shooter
+    Vaisseau_rect.left=268
+    Vaisseau_rect.top=736
+    print("patate capitaine")
+    fenetre.blit(Vaisseau,Vaisseau_rect)
+    #On reset toute les listes
+    liste_tir =[]
+    liste_mob =[]
+    liste_shot =[]
+    liste_rect_tir=[]
+    liste_rect_mob=[]
+    liste_rect_shot=[]
+    liste_shot_supr=[]
+    liste_mob_supr=[]
+    liste_tir_supr=[]
+    #On remet le nombre de vie
+    vie = 3
+    #On reset les inputs
+    keys = [False, False, False]
+
+    timer=pygame.time.Clock()
+
+    temps=pygame.time.get_ticks()
+    tps_mob=pygame.time.get_ticks()
+    tps_fastmob=pygame.time.get_ticks()
+    tps_shooter=pygame.time.get_ticks()
+    return Vaisseau_rect,liste_tir,liste_mob,liste_shot,liste_rect_tir,liste_rect_mob,liste_rect_shot,liste_mob_supr,liste_tir_supr,vie,keys,timer,temps,tps_mob,tps_fastmob,tps_shooter
+
+class objet:
+    """Cette classe définit tout les élements se déplaceant dans le sens vertical"""
+    def __init__(self, image, hauteur, vitesse,x):
+        self.vitesse = vitesse
+        self.image = image
+        self.pos = image.get_rect().move(x, hauteur)
+        
+    def move(self):
+        """cette fonction fait bouger l'objet auquel il est associé"""
+        self.pos = self.pos.move(0, self.vitesse)
