@@ -12,7 +12,7 @@ pygame.mixer.init()
 continuer=1
 while continuer==1:
     #On initialise les variables à leur valeur de départ (cf fonction Init)
-    Vaisseau_rect,liste_tir,liste_mob,liste_shot,liste_rect_tir,liste_rect_mob,liste_rect_shot,liste_mob_supr,liste_tir_supr,vie,keys,timer,temps,tps_mob,tps_fastmob,tps_shooter =Init()
+    Vaisseau_rect,liste_tir,liste_mob,liste_shot,liste_rect_tir,liste_rect_mob,liste_rect_shot,liste_mob_supr,liste_tir_supr,vie,keys,timer,temps,tps_mob,tps_fastmob,tps_shooter,temps_depuis_derniere_mort=Init()
     print(vie)
     while vie !=0:
             #On détecte les différents input et on les traite
@@ -119,3 +119,4 @@ while continuer==1:
                 if event.key==K_ESCAPE:
                     pygame.quit()
                     exit()
+        
