@@ -63,8 +63,9 @@ mort = pygame.mixer.Sound("sound/mort.wav")
 keys = [False, False, False]
 timer=pygame.time.Clock()
 
+temps_depuis_derniere_mort=0
+temps=0
+tps_mob=0
+tps_fastmob=0
+tps_shooter=0
 
-temps=pygame.time.get_ticks()
-tps_mob=pygame.time.get_ticks()
-tps_fastmob=pygame.time.get_ticks()
-tps_shooter=pygame.time.get_ticks()
