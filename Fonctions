@@ -23,15 +23,15 @@ def Mouvement(liste,liste_rect,limite,vie,degat =False,bas= True):
         liste_rect.append(i.pos)
         if i.pos.top >= limite and bas==True and degat ==True:
            vie=vie-1
-           liste=liste[1:]
+           liste.pop(0)
            
         elif i.pos.top >=limite and bas==True:
-            liste=liste[1:]
+            liste.pop(0)
         elif i.pos.top <= limite and bas==False and degat==True:
             vie=vie-1
-            liste=liste[1:]
+            liste.pop(0)
         elif i.pos.top <= limite and bas==False :
-            liste=liste[1:]
+            liste.pop(0)
     return liste ,liste_rect,vie
 def Collision(rect,liste_rect,liste,vie,degat=False,rect_liste=False,j= 0,liste_2=[]):
  """Cette fonction permet de calculer les collisions entre des élements et le cas écheant les supprimer"""
