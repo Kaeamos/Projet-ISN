@@ -55,11 +55,11 @@ while continuer==1:
                     liste_tir.append(o)
                                         ###Spawn des mobs###
             #Spawn du tireur
-        liste_mob,liste_shot,tps_shooter = spawn(100,10000,image_shooter,1,tps_shooter,True)
-        
+        liste_mob,liste_shot,tps_shooter = spawn(100,10000,image_shooter,1,tps_shooter,1)
             #Spawn du mob rapide
         liste_mob,liste_shot,tps_fastmob = spawn(15000,5000,image_fastmob,5,tps_fastmob)
             #Spawn des mobs classiques
+        random_tir_mob=randrange(1,10,1)
         random_image_mob=randrange(1,6,1)
         if random_image_mob==1:  
             image_mob = mob1
@@ -67,7 +67,10 @@ while continuer==1:
             image_mob = mob2
         else:
             image_mob = mob3
-        liste_mob,liste_shot,tps_mob = spawn(5000,1200,image_mob,3,tps_mob)
+        if random_tir_mob <= 8:
+            liste_mob,liste_shot,tps_mob = spawn(5000,1200,image_mob,3,tps_mob)
+        else:
+            liste_mob,liste_shot,tps_mob = spawn(5000,1200,image_mob,2,tps_mob,2)
         
                                       ###Mouvement des mobs###
 
