@@ -35,40 +35,50 @@ def Mouvement(liste,liste_rect,limite,vie,degat =False,bas= True):
         elif i.pos.top <= limite and bas==False :
             liste.pop(0)
     return liste ,liste_rect,vie
-def Collision(rect,liste_rect,liste,vie,degat=False,rect_liste=False,j= 0,liste_2=[]):
+def Collision(rect,liste_rect,liste,vie,degat=False,rect_liste=False,j= 0,liste_2=[],bonus= False, liste_bonus =liste_bonus):
  """Cette fonction permet de calculer les collisions entre des élements et le cas écheant les supprimer"""
- liste_supr=[]
- liste_supr_2=[]
- hit = rect.collidelist(liste_rect)
- if hit != -1:
-      liste_supr.append(hit)
-      if rect_liste == True:
-           liste_supr_2.append(j)
- for l in range(0,len(liste_supr)):
-      liste[liste_supr[l]]=-42
- for l in range(0,liste.count(-42)):
-      liste.remove(-42)
-      if degat== True:
-           vie=vie-1
- if rect_liste==True:
-      for l in range(0,len(liste_supr_2)):
-           liste_2[liste_supr_2[l]]=-42
-      for l in range(0,liste_2.count(-42)):
-           liste_2.remove(-42)
-           if degat== True:
-                vie=vie-1
-      return liste,liste_2,vie
- else:
-      return liste,vie
- return liste,vie
+ try:
+     liste_supr=[]
+     liste_supr_2=[]
+     collision = False
+     hit = rect.collidelist(liste_rect)
+     if hit != -1:
+          liste_supr.append(hit)
+          collision = True
+          if rect_liste == True:
+               liste_supr_2.append(j)
+          if bonus == True:
+              if randrange(1,30,1) <= 6:
+                  liste_bonus.append(liste_rect[hit])
+     for l in range(0,len(liste_supr)):
+          liste[liste_supr[l]]=-42
+     for l in range(0,liste.count(-42)):
+          liste.remove(-42)
+          if degat== True:
+               vie=vie-1
+     if rect_liste==True:
+          for l in range(0,len(liste_supr_2)):
+               liste_2[liste_supr_2[l]]=-42
+          for l in range(0,liste_2.count(-42)):
+               liste_2.remove(-42)
+               if degat== True:
+                    vie=vie-1
+          return liste,liste_2,vie,liste_bonus,collision
+     else:
+          return liste,vie,collision
+ except:
+     if rect_liste == True:
+         return liste,liste_2,vie,liste_bonus,collision
+     else:
+         return liste,vie,collision
+
 def Affichage(liste):
  """Cette fonction permet d'afficher les élements donnés en argument à l'écran"""
  for o in liste:
         fenetre.blit(o.image, o.pos)
 def Init():
     """Fonction qui remet les valeurs initiales des différents elements avant chaque partie"""
-    global Vaisseau_rect,liste_tir,liste_mob,liste_shot,liste_rect_tir,liste_rect_mob,liste_rect_shot
-    global liste_mob_supr,liste_tir_supr,vie,keys,timer,temps,tps_mob,tps_fastmob,tps_shooter,temps_depuis_derniere_mort
+    global Vaisseau_rect,liste_tir,liste_mob,liste_shot,liste_rect_tir,liste_rect_mob,liste_rect_shot,vie,keys,timer,temps,tps_mob,tps_fastmob,tps_shooter,temps_depuis_derniere_mort,liste_rect_heal,liste_rect_shotspeedup,liste_rect_bombe,liste_bonus,liste_heal,liste_shotspeedup,liste_bombe,vitesse_tir
     Vaisseau_rect.left=268
     Vaisseau_rect.top=736
     fenetre.blit(Vaisseau,Vaisseau_rect)
@@ -79,9 +89,15 @@ def Init():
     liste_rect_tir=[]
     liste_rect_mob=[]
     liste_rect_shot=[]
-    liste_shot_supr=[]
-    liste_mob_supr=[]
-    liste_tir_supr=[]
+    
+    liste_rect_heal =[]
+    liste_rect_shotspeedup =[]
+    liste_rect_bombe=[]
+    liste_bonus = []
+    liste_heal= []
+    liste_shotspeedup=[]
+    liste_bombe = []
+    
     #On remet le nombre de vie
     vie = 3
     #On reset les inputs
@@ -90,11 +106,13 @@ def Init():
     timer=pygame.time.Clock()
     temps_depuis_derniere_mort=pygame.time.get_ticks()
 
+    vitesse_tir = 500
+
     temps=pygame.time.get_ticks()
     tps_mob=pygame.time.get_ticks()
     tps_fastmob=pygame.time.get_ticks()
     tps_shooter=pygame.time.get_ticks()
-    return Vaisseau_rect,liste_tir,liste_mob,liste_shot,liste_rect_tir,liste_rect_mob,liste_rect_shot,liste_mob_supr,liste_tir_supr,vie,keys,timer,temps,tps_mob,tps_fastmob,tps_shooter,temps_depuis_derniere_mort
+    return Vaisseau_rect,liste_tir,liste_mob,liste_shot,liste_rect_tir,liste_rect_mob,liste_rect_shot,vie,keys,timer,temps,tps_mob,tps_fastmob,tps_shooter,temps_depuis_derniere_mort,liste_rect_heal,liste_rect_shotspeedup,liste_rect_bombe,liste_bonus,liste_heal,liste_shotspeedup,liste_bombe,vitesse_tir
 
 class objet:
     """Cette classe définit tout les élements se déplaceant dans le sens vertical"""
