@@ -2,7 +2,7 @@
 import pygame
 from Variable_Init import *
 from random import *
-def spawn (temps_mini,intervalle,image,vitesse,time_since_last_spawn,Shot = 0):
+def spawn (temps_mini,intervalle,image,vitesse,time_since_last_spawn,liste_mob= [],liste_shot=[],Shot = 0):
     """Cette fonction fait apparaitre un enemi en fonction des arguments donnés """
     if pygame.time.get_ticks()>=temps_mini+temps_depuis_derniere_mort and pygame.time.get_ticks()>time_since_last_spawn+intervalle:
         time_since_last_spawn=pygame.time.get_ticks()
