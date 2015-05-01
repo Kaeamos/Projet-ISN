@@ -25,8 +25,8 @@ def Mouvement(liste,liste_rect,limite,vie,degat =False,bas= True):
         liste_rect.append(i.pos)
         if i.pos.top >= limite and bas==True and degat ==True:
             touche.play
-           vie=vie-1
-           liste.pop(0)
+            vie=vie-1
+            liste.pop(0)
            
         elif i.pos.top >=limite and bas==True:
             liste.pop(0)
