@@ -15,7 +15,7 @@ Vaisseau_rect=Vaisseau.get_rect()
 
 Vaisseau_rect.left=268
 Vaisseau_rect.top=736
-
+vitesse_tir =500
 
 #Chargement des sprites de mobs
 mob1=pygame.image.load("img/mob1.png").convert_alpha()
@@ -39,6 +39,15 @@ image_shot_rect=image_shot.get_rect()
 image_shot2=pygame.image.load("img/shooter_tir2.png").convert_alpha()
 image_shot2_rect=image_shot2.get_rect()
 
+image_heal=pygame.image.load("img/coeur.png").convert()
+image_heal_rect=image_heal.get_rect()
+
+image_shotspeedup=pygame.image.load("img/shotspeedup.png").convert()
+image_shotspeedup_rect=image_shotspeedup.get_rect()
+
+image_bombe=pygame.image.load("img/bombe.png").convert()
+image_bombe_rect=image_bombe.get_rect()
+
 #Chargement des Coeurs
 heart=pygame.image.load("img/HP.png").convert_alpha()
 
@@ -52,17 +61,21 @@ liste_tir =[]
 liste_mob =[]
 liste_shot =[]
 
+liste_bonus = []
+liste_heal= []
+liste_shotspeedup=[]
+liste_bombe = []
+
 #On initialise la liste des Hitbox des mobs ET des tirs et de leurs suppressions
 liste_rect_tir=[]
 liste_rect_mob=[]
 liste_rect_shot=[]
-liste_shot_supr=[]
-liste_mob_supr=[]
-liste_tir_supr=[]
+
+liste_rect_heal =[]
+liste_rect_shotspeedup =[]
+liste_rect_bombe=[]
 
 fleche = 3
-
-
 #On défini le nombre de vie de base
 vie = 3
 #On charge les bruitages
