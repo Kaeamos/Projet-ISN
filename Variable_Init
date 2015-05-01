@@ -81,6 +81,10 @@ vie = 3
 #On charge les bruitages
 laser = pygame.mixer.Sound("sound/laser.wav")
 mort = pygame.mixer.Sound("sound/mort.wav")
+touche = pygame.mixer.Sound("sound/touche.wav")
+touche_enemi = pygame.mixer.Sound("sound/touche_enemi.wav")
+bip = pygame.mixer.Sound("sound/bip.wav")
+
 
 keys = [False, False, False]
 timer=pygame.time.Clock()
