@@ -2,16 +2,18 @@
 import pygame
 from Variable_Init import *
 from random import *
-def spawn (temps_mini,intervalle,image,vitesse,time_since_last_spawn,Shot = False):
+def spawn (temps_mini,intervalle,image,vitesse,time_since_last_spawn,Shot = 0):
     """Cette fonction fait apparaitre un enemi en fonction des arguments donnés """
-    global liste_mob,image_shot,liste_shot
     if pygame.time.get_ticks()>=temps_mini+temps_depuis_derniere_mort and pygame.time.get_ticks()>time_since_last_spawn+intervalle:
         time_since_last_spawn=pygame.time.get_ticks()
         position_mob = randrange(20,516,42)
         monstre = objet(image,0,vitesse,position_mob)
         liste_mob.append(monstre)
-        if Shot == True:
+        if Shot == 1:
             shooter_shot = objet(image_shot,0,4,position_mob+45)
+            liste_shot.append(shooter_shot)
+        elif Shot == 2:
+            shooter_shot = objet(image_shot2,0,5,position_mob+32)
             liste_shot.append(shooter_shot)
     return liste_mob , liste_shot ,time_since_last_spawn
 
@@ -64,12 +66,11 @@ def Affichage(liste):
  for o in liste:
         fenetre.blit(o.image, o.pos)
 def Init():
-    """Fonction qui remets les valeurs initiales des différents elements avant chaque partie"""
+    """Fonction qui remet les valeurs initiales des différents elements avant chaque partie"""
     global Vaisseau_rect,liste_tir,liste_mob,liste_shot,liste_rect_tir,liste_rect_mob,liste_rect_shot
     global liste_mob_supr,liste_tir_supr,vie,keys,timer,temps,tps_mob,tps_fastmob,tps_shooter,temps_depuis_derniere_mort
     Vaisseau_rect.left=268
     Vaisseau_rect.top=736
-    print("patate capitaine")
     fenetre.blit(Vaisseau,Vaisseau_rect)
     #On reset toute les listes
     liste_tir =[]
