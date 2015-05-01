@@ -11,8 +11,10 @@ def menu (fleche):
             if event.type==KEYDOWN:
                 if event.key == K_w and fleche !=3:
                     fleche = fleche+1
+                    bip.play()
                 if event.key == K_s and fleche !=1:
                     fleche = fleche-1
+                    bip.play()
                 if event.key == K_SPACE:
                     start = 2
         if fleche == 3:
@@ -26,6 +28,7 @@ def menu (fleche):
         if fleche == 3 and start == 2:
             fenetre.blit(Vaisseau,Vaisseau_rect)
             start = 1
+            gong.play()
         if fleche == 2 and start == 2:
             patate = 0
         if fleche == 1 and start == 2:
