@@ -1,161 +1,126 @@
 # -*- coding: utf8 -*-
-
 import pygame
-from pygame.locals import *
-import traceback
-from random import *
-pygame.mixer.pre_init(44100, -16, 2, 2048)
-pygame.init()
 from Variable_Init import *
-from Fonctions import *
-from menu import *
-pygame.mixer.init()
-continuer=1
-start = 0
-#menu
+from random import *
+def spawn (temps_mini,intervalle,image,vitesse,time_since_last_spawn,liste_mob= [],liste_shot=[],Shot = 0):
+    """Cette fonction fait apparaitre un enemi en fonction des arguments donnés """
+    if pygame.time.get_ticks()>=temps_mini+temps_depuis_derniere_mort and pygame.time.get_ticks()>time_since_last_spawn+intervalle:
+        time_since_last_spawn=pygame.time.get_ticks()
+        position_mob = randrange(20,516,42)
+        monstre = objet(image,0,vitesse,position_mob)
+        liste_mob.append(monstre)
+        if Shot == 1:
+            shooter_shot = objet(image_shot,0,4,position_mob+45)
+            liste_shot.append(shooter_shot)
+        elif Shot == 2:
+            shooter_shot = objet(image_shot2,0,5,position_mob+32)
+            liste_shot.append(shooter_shot)
+    return liste_mob , liste_shot ,time_since_last_spawn
 
-while continuer==1:
-    start = menu(3)
-    #On initialise les variables à leur valeur de départ (cf fonction Init)
-    Vaisseau_rect,liste_tir,liste_mob,liste_shot,liste_rect_tir,liste_rect_mob,liste_rect_shot,vie,keys,timer,temps,tps_mob,tps_fastmob,tps_shooter,temps_depuis_derniere_mort,liste_rect_heal,liste_rect_shotspeedup,liste_rect_bombe,liste_bonus,liste_heal,liste_shotspeedup,liste_bombe,vitesse_tir=Init()
-    while vie !=0:
-            #On détecte les différents input et on les traite
-        for event in pygame.event.get():
-            #moyen pour sortir de la boucle
-            if event.type==QUIT:
-                pygame.quit()
-                exit()
-            if event.type==KEYDOWN:
-                if event.key==K_a:
-                    keys[0]=True           
-                if event.key==K_d:
-                    keys[1]=True     
-                if event.key==K_w:
-                    keys[2]=True
-                if event.key==K_ESCAPE:
-                    pygame.quit()
-                    exit()
-            if event.type==KEYUP: 
-                if event.key==K_a:
-                    keys[0]=False
-                if event.key==K_d:
-                    keys[1]=False
-                if event.key==K_w:
-                    keys[2]=False
-            #On effectue les actions associées à chaque touche
-        if keys[0]:
-            Vaisseau_rect=Vaisseau_rect.move(-7,0)
-            if Vaisseau_rect.left<0:
-                Vaisseau_rect.left=0
-        if keys[1]:
-            Vaisseau_rect=Vaisseau_rect.move(7,0)
-            if Vaisseau_rect.right>600:
-                Vaisseau_rect.right=600
-        if keys[2]:
-            if pygame.time.get_ticks()>= temps+vitesse_tir:
-                    laser.play()
-                    temps=pygame.time.get_ticks()
-                    o = objet(tir,736, -10,Vaisseau_rect.left +32)
-                    liste_tir.append(o)
-                                        ###Spawn des mobs###
-            #Spawn du tireur
-        liste_mob,liste_shot,tps_shooter = spawn(100,10000,image_shooter,1,tps_shooter,1)
-            #Spawn du mob rapide
-        liste_mob,liste_shot,tps_fastmob = spawn(15000,5000,image_fastmob,5,tps_fastmob)
-            #Spawn des mobs classiques
-        random_tir_mob=randrange(1,10,1)
-        random_image_mob=randrange(1,6,1)
-        if random_image_mob==1:  
-            image_mob = mob1
-        elif random_image_mob >1 and random_image_mob <4:
-            image_mob = mob2
-        else:
-            image_mob = mob3
-        if random_tir_mob <= 8:
-            liste_mob,liste_shot,tps_mob = spawn(5000,1200,image_mob,3,tps_mob)
-        else:
-            liste_mob,liste_shot,tps_mob = spawn(5000,1200,image_mob,2,tps_mob,2)
-            #spawn des bonus
-        for i in liste_bonus:
-            random_bonus = randrange(1,5,1)
-            if random_bonus <= 2:
-                k = objet(image_heal,i.top,6,i.left +13)
-                liste_heal.append(k)
-                
-            elif random_bonus <=4:
-                l = objet(image_shotspeedup,i.top,6,i.left +13)
-                liste_shotspeedup.append(l)
-                
-            else:
-                m = objet(image_bombe,i.top,6,i.left +13)
-                liste_bombe.append(m)
-                
-        liste_bonus = []
-        
-                                      ###Mouvement des mobs###
+def Mouvement(liste,liste_rect,limite,vie,degat =False,bas= True):
+    """Cette fonction permet de faire bouger tout les élements à l'écran à l'exception du vaisseau"""
+    liste_rect=[]
+    for i in liste:
+        i.move()
+        liste_rect.append(i.pos)
+        if i.pos.top >= limite and bas==True and degat ==True:
+           vie=vie-1
+           liste.pop(0)
+           
+        elif i.pos.top >=limite and bas==True:
+            liste.pop(0)
+        elif i.pos.top <= limite and bas==False and degat==True:
+            vie=vie-1
+            liste.pop(0)
+        elif i.pos.top <= limite and bas==False :
+            liste.pop(0)
+    return liste ,liste_rect,vie
+def Collision(rect,liste_rect,liste,vie,degat=False,rect_liste=False,j= 0,liste_2=[],bonus= False, liste_bonus =liste_bonus):
+ """Cette fonction permet de calculer les collisions entre des élements et le cas écheant les supprimer"""
+ try:
+     liste_supr=[]
+     liste_supr_2=[]
+     collision = False
+     hit = rect.collidelist(liste_rect)
+     if hit != -1:
+          liste_supr.append(hit)
+          collision = True
+          if rect_liste == True:
+               liste_supr_2.append(j)
+          if bonus == True:
+              if randrange(1,30,1) <= 5:
+                  liste_bonus.append(liste_rect[hit])
+     for l in range(0,len(liste_supr)):
+          liste[liste_supr[l]]=-42
+     for l in range(0,liste.count(-42)):
+          liste.remove(-42)
+          if degat== True:
+               vie=vie-1
+     if rect_liste==True:
+          for l in range(0,len(liste_supr_2)):
+               liste_2[liste_supr_2[l]]=-42
+          for l in range(0,liste_2.count(-42)):
+               liste_2.remove(-42)
+               if degat== True:
+                    vie=vie-1
+          return liste,liste_2,vie,liste_bonus,collision
+     else:
+          return liste,vie,collision
+ except:
+     if rect_liste == True:
+         return liste,liste_2,vie,liste_bonus,collision
+     else:
+         return liste,vie,collision
 
-        
-        liste_mob,liste_rect_mob,vie = Mouvement(liste_mob,liste_rect_mob,832,vie,True)
-        
-                                      ###Mouvement des tirs###      
-            #Tirs enemi
-        liste_shot,liste_rect_shot,vie= Mouvement(liste_shot,liste_rect_shot,830,vie)
-            #Tirs allié
-        liste_tir,liste_rect_tir,vie = Mouvement(liste_tir,liste_rect_tir,-16,vie,False,False)
-
-                                    ###Mouvement des bonus###
-        #heal
-        liste_heal,liste_rect_heal,vie = Mouvement(liste_heal,liste_rect_heal,825,vie,False,True)
-        #Shotspeedup
-        liste_shotspeedup,liste_rect_shotspeedup,vie = Mouvement(liste_shotspeedup,liste_rect_shotspeedup,825,vie,False,True)
-        #bombe
-        liste_bombe,liste_rect_bombe,vie = Mouvement(liste_bombe,liste_rect_bombe,825,vie,False,True)
-                                    ###calcul Collisions###
-            #On regarde si il y a collision entre le vaisseau et un tir ennemi , Si il y a collision, le tir ennemi est supprimé
-        liste_shot,vie,collision=Collision(Vaisseau_rect,liste_rect_shot,liste_shot,vie,True)
-            #On regarde si il y a collision entre le vaisseau et un  ennemi , Si il y a collision, l'ennemi est supprimé
-        liste_mob,vie,collision=Collision(Vaisseau_rect,liste_rect_mob,liste_mob,vie,True)
-            #On regarde si il y a collision en un tir allié et un enemi ,sil il y a collision l'enemi et letirs sont supprimés
-        for j in range (0,len(liste_rect_tir) ):
-            liste_mob,liste_tir,vie,liste_bonus,collision=Collision(liste_rect_tir[j],liste_rect_mob,liste_mob,vie,False,True,j,liste_tir,True,liste_bonus)
-        fenetre.blit(fond, (0,0))
-
-            #On regarde si il y a collision entre un heal et le vaisseau,Si il y a collision, le bonus est supprimé et son effet est appliqué    
-        liste_heal,vie,collision = Collision(Vaisseau_rect,liste_rect_heal,liste_heal,vie)
-        if collision == True and vie != 3 :
-            vie=vie+1
-            #On regarde si il y a collision entre un speedup et le vaisseau,Si il y a collision, le bonus est supprimé et son effet est appliqué
-        liste_shotspeedup,vie,collision = Collision(Vaisseau_rect,liste_rect_shotspeedup,liste_shotspeedup,vie)
-        if collision == True  :
-            vitesse_tir =vitesse_tir -25
-            #On regarde si il y a collision entre une bombe et le vaisseau,Si il y a collision, le bonus est supprimé et son effet est appliqué
-        liste_bombe,vie,collision = Collision(Vaisseau_rect,liste_rect_bombe,liste_bombe,vie)
-        if collision == True :
-            liste_mob=[]
-        
-                            ###On affiche les élements à l'écran###
-        Affichage(liste_tir)            
-        Affichage(liste_mob)
-        Affichage(liste_shot)
-        Affichage(liste_heal)
-        Affichage(liste_shotspeedup)
-        Affichage(liste_bombe)
-        if vie >= 3:
-            fenetre.blit(heart, (580,780))
-        if vie >= 2:
-            fenetre.blit(heart, (555,780))
-        if vie >= 1:
-            fenetre.blit(heart, (530,780))
-        
-        fenetre.blit(Vaisseau,Vaisseau_rect)    
-        pygame.display.update()
-        clock=timer.tick(60) #Limite les FPS à 60
-    #Cette partie est excutée lorsque le vaiseeau n'a plus de vie
-    mort.play()
-    """
-    fenetre.blit(fond, (0,0))
-    fenetre.blit(GameOver,(0,0))
-    pygame.display.update()"""
+def Affichage(liste):
+ """Cette fonction permet d'afficher les élements donnés en argument à l'écran"""
+ for o in liste:
+        fenetre.blit(o.image, o.pos)
+def Init():
+    """Fonction qui remet les valeurs initiales des différents elements avant chaque partie"""
+    global Vaisseau_rect,liste_tir,liste_mob,liste_shot,liste_rect_tir,liste_rect_mob,liste_rect_shot,vie,keys,timer,temps,tps_mob,tps_fastmob,tps_shooter,temps_depuis_derniere_mort,liste_rect_heal,liste_rect_shotspeedup,liste_rect_bombe,liste_bonus,liste_heal,liste_shotspeedup,liste_bombe,vitesse_tir
+    Vaisseau_rect.left=268
+    Vaisseau_rect.top=736
+    fenetre.blit(Vaisseau,Vaisseau_rect)
+    #On reset toute les listes
+    liste_tir =[]
+    liste_mob =[]
+    liste_shot =[]
+    liste_rect_tir=[]
+    liste_rect_mob=[]
+    liste_rect_shot=[]
     
+    liste_rect_heal =[]
+    liste_rect_shotspeedup =[]
+    liste_rect_bombe=[]
+    liste_bonus = []
+    liste_heal= []
+    liste_shotspeedup=[]
+    liste_bombe = []
     
+    #On remet le nombre de vie
+    vie = 3
+    #On reset les inputs
+    keys = [False, False, False]
+
+    timer=pygame.time.Clock()
+    temps_depuis_derniere_mort=pygame.time.get_ticks()
+
+    vitesse_tir = 500
+
+    temps=pygame.time.get_ticks()
+    tps_mob=pygame.time.get_ticks()
+    tps_fastmob=pygame.time.get_ticks()
+    tps_shooter=pygame.time.get_ticks()
+    return Vaisseau_rect,liste_tir,liste_mob,liste_shot,liste_rect_tir,liste_rect_mob,liste_rect_shot,vie,keys,timer,temps,tps_mob,tps_fastmob,tps_shooter,temps_depuis_derniere_mort,liste_rect_heal,liste_rect_shotspeedup,liste_rect_bombe,liste_bonus,liste_heal,liste_shotspeedup,liste_bombe,vitesse_tir
+
+class objet:
+    """Cette classe définit tout les élements se déplaceant dans le sens vertical"""
+    def __init__(self, image, hauteur, vitesse,x):
+        self.vitesse = vitesse
+        self.image = image
+        self.pos = image.get_rect().move(x, hauteur)
         
+    def move(self):
+        """cette fonction fait bouger l'objet auquel il est associé"""
+        self.pos = self.pos.move(0, self.vitesse)
