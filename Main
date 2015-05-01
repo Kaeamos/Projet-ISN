@@ -77,12 +77,12 @@ while continuer==1:
             liste_mob,liste_shot,tps_mob = spawn(5000,1200,image_mob,2,tps_mob,2)
             #spawn des bonus
         for i in liste_bonus:
-            random_bonus = randrange(1,6,1)
-            if random_bonus <= 3:
+            random_bonus = randrange(1,5,1)
+            if random_bonus <= 2:
                 k = objet(image_heal,i.top,6,i.left +13)
                 liste_heal.append(k)
                 
-            elif random_bonus <=5:
+            elif random_bonus <=4:
                 l = objet(image_shotspeedup,i.top,6,i.left +13)
                 liste_shotspeedup.append(l)
                 
