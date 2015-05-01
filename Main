@@ -94,7 +94,7 @@ while continuer==1:
         
                                       ###Mouvement des mobs###
 
-        print(liste_mob)
+        
         liste_mob,liste_rect_mob,vie = Mouvement(liste_mob,liste_rect_mob,832,vie,True)
         
                                       ###Mouvement des tirs###      
