@@ -1,0 +1,80 @@
+# -*- coding: utf8 -*-
+import pygame
+"""Ce dossier contiens toute les valeurs par défaut des variables utilisées"""
+"""On réinitialise ces variables à chaque début de partie en faisant appel à la fonction Init"""
+
+#Ouverture de la fenêtre Pygame
+fenetre = pygame.display.set_mode((600,800))
+#Chargement et collage du fond
+menu_fond = pygame.image.load("img/menu.jpg").convert()
+fond = pygame.image.load("img/background1.jpg").convert()
+GameOver= pygame.image.load("img/GameOver.png").convert_alpha()
+#Chargement et collage du vaisseau
+Vaisseau=pygame.image.load("img/Vaisseau.png").convert_alpha()
+Vaisseau_rect=Vaisseau.get_rect()
+
+Vaisseau_rect.left=268
+Vaisseau_rect.top=736
+
+
+#Chargement des sprites de mobs
+mob1=pygame.image.load("img/mob1.png").convert_alpha()
+mob1_rect=mob1.get_rect()
+
+mob2=pygame.image.load("img/mob2.png").convert_alpha()
+mob2_rect=mob2.get_rect()
+
+mob3=pygame.image.load("img/mob3.png").convert_alpha()
+mob3_rect=mob3.get_rect()
+
+image_fastmob=pygame.image.load("img/fastmob.png").convert_alpha()
+image_fastmob_rect=image_fastmob.get_rect()
+
+image_shooter=pygame.image.load("img/shooter.png").convert_alpha()
+image_shooter_rect=image_shooter.get_rect()
+
+image_shot=pygame.image.load("img/shooter_tir.png").convert_alpha()
+image_shot_rect=image_shot.get_rect()
+
+image_shot2=pygame.image.load("img/shooter_tir2.png").convert_alpha()
+image_shot2_rect=image_shot2.get_rect()
+
+#Chargement des Coeurs
+heart=pygame.image.load("img/HP.png").convert_alpha()
+
+image_fleche = pygame.image.load("img/fleche.png").convert_alpha()
+
+#Chargement du tir
+tir=pygame.image.load("img/tir.png").convert_alpha()
+tir_rect=tir.get_rect()
+#on crée des listes qui contiendront les coordonnées du tir et des mobs
+liste_tir =[]
+liste_mob =[]
+liste_shot =[]
+
+#On initialise la liste des Hitbox des mobs ET des tirs et de leurs suppressions
+liste_rect_tir=[]
+liste_rect_mob=[]
+liste_rect_shot=[]
+liste_shot_supr=[]
+liste_mob_supr=[]
+liste_tir_supr=[]
+
+fleche = 3
+
+
+#On défini le nombre de vie de base
+vie = 3
+#On charge les bruitages
+laser = pygame.mixer.Sound("sound/laser.wav")
+mort = pygame.mixer.Sound("sound/mort.wav")
+
+keys = [False, False, False]
+timer=pygame.time.Clock()
+
+temps_depuis_derniere_mort=0
+temps=0
+tps_mob=0
+tps_fastmob=0
+tps_shooter=0
+
