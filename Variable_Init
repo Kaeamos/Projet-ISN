@@ -84,6 +84,14 @@ mort = pygame.mixer.Sound("sound/mort.wav")
 touche = pygame.mixer.Sound("sound/touche.wav")
 touche_enemi = pygame.mixer.Sound("sound/touche_enemi.wav")
 bip = pygame.mixer.Sound("sound/bip.wav")
+gong = pygame.mixer.Sound("sound/gong.wav")
+menubip = pygame.mixer.Sound("sound/menubip.wav")
+menubip.set_volume(0.4)
+gong.set_volume(0.5)
+laser.set_volume(0.3)
+touche.set_volume(0.3)
+bip.set_volume(0.3)
+touche_enemi.set_volume(0.3)
 
 
 keys = [False, False, False]
