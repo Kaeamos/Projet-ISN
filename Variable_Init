@@ -6,6 +6,7 @@ import pygame
 #Ouverture de la fenêtre Pygame
 fenetre = pygame.display.set_mode((600,800))
 #Chargement et collage du fond
+menu_fond = pygame.image.load("img/menu.jpg").convert()
 fond = pygame.image.load("img/background1.jpg").convert()
 GameOver= pygame.image.load("img/GameOver.png").convert_alpha()
 #Chargement et collage du vaisseau
@@ -15,7 +16,7 @@ Vaisseau_rect=Vaisseau.get_rect()
 Vaisseau_rect.left=268
 Vaisseau_rect.top=736
 
-fenetre.blit(Vaisseau,Vaisseau_rect)
+
 #Chargement des sprites de mobs
 mob1=pygame.image.load("img/mob1.png").convert_alpha()
 mob1_rect=mob1.get_rect()
@@ -41,6 +42,8 @@ image_shot2_rect=image_shot2.get_rect()
 #Chargement des Coeurs
 heart=pygame.image.load("img/HP.png").convert_alpha()
 
+image_fleche = pygame.image.load("img/fleche.png").convert_alpha()
+
 #Chargement du tir
 tir=pygame.image.load("img/tir.png").convert_alpha()
 tir_rect=tir.get_rect()
@@ -56,6 +59,9 @@ liste_rect_shot=[]
 liste_shot_supr=[]
 liste_mob_supr=[]
 liste_tir_supr=[]
+
+fleche = 3
+
 
 #On défini le nombre de vie de base
 vie = 3
