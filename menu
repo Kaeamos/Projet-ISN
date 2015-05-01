@@ -11,10 +11,10 @@ def menu (fleche):
             if event.type==KEYDOWN:
                 if event.key == K_w and fleche !=3:
                     fleche = fleche+1
-                    bip.play()
+                    menubip.play()
                 if event.key == K_s and fleche !=1:
                     fleche = fleche-1
-                    bip.play()
+                    menubip.play()
                 if event.key == K_SPACE:
                     start = 2
         if fleche == 3:
