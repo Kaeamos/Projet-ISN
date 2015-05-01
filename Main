@@ -12,8 +12,9 @@ from menu import *
 pygame.mixer.init()
 continuer=1
 start = 0
-#menu
-
+pygame.mixer.music.load("sound/music1.wav")
+pygame.mixer.music.play(-1)
+pygame.mixer.music.set_volume(1.5)
 while continuer==1:
     start = menu(3)
     #On initialise les variables à leur valeur de départ (cf fonction Init)
@@ -55,7 +56,7 @@ while continuer==1:
             if pygame.time.get_ticks()>= temps+vitesse_tir:
                     laser.play()
                     temps=pygame.time.get_ticks()
-                    o = objet(tir,736, -10,Vaisseau_rect.left +28)
+                    o = objet(tir,736, -10,Vaisseau_rect.left +32)
                     liste_tir.append(o)
                                         ###Spawn des mobs###
             #Spawn du tireur
@@ -94,7 +95,6 @@ while continuer==1:
         
                                       ###Mouvement des mobs###
 
-        
         liste_mob,liste_rect_mob,vie = Mouvement(liste_mob,liste_rect_mob,832,vie,True)
         
                                       ###Mouvement des tirs###      
