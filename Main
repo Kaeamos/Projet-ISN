@@ -55,7 +55,7 @@ while continuer==1:
             if pygame.time.get_ticks()>= temps+vitesse_tir:
                     laser.play()
                     temps=pygame.time.get_ticks()
-                    o = objet(tir,736, -10,Vaisseau_rect.left +32)
+                    o = objet(tir,736, -10,Vaisseau_rect.left +28)
                     liste_tir.append(o)
                                         ###Spawn des mobs###
             #Spawn du tireur
