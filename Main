@@ -13,8 +13,9 @@ pygame.mixer.init()
 continuer=1
 start = 0
 #menu
-start = menu(3)
+
 while continuer==1:
+    start = menu(3)
     #On initialise les variables à leur valeur de départ (cf fonction Init)
     Vaisseau_rect,liste_tir,liste_mob,liste_shot,liste_rect_tir,liste_rect_mob,liste_rect_shot,vie,keys,timer,temps,tps_mob,tps_fastmob,tps_shooter,temps_depuis_derniere_mort,liste_rect_heal,liste_rect_shotspeedup,liste_rect_bombe,liste_bonus,liste_heal,liste_shotspeedup,liste_bombe,vitesse_tir=Init()
     while vie !=0:
@@ -151,18 +152,10 @@ while continuer==1:
         clock=timer.tick(60) #Limite les FPS à 60
     #Cette partie est excutée lorsque le vaiseeau n'a plus de vie
     mort.play()
+    """
     fenetre.blit(fond, (0,0))
     fenetre.blit(GameOver,(0,0))
-    pygame.display.update()
+    pygame.display.update()"""
     
-    wait_replay =0
-    while wait_replay!=1:
-       
-       for event in pygame.event.get():
-            if event.type==KEYDOWN:
-                if event.key==K_SPACE:
-                    wait_replay=1
-                if event.key==K_ESCAPE:
-                    pygame.quit()
-                    exit()
+    
         
