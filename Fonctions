@@ -2,6 +2,9 @@
 import pygame
 from Variable_Init import *
 from random import *
+from pygame.locals import *
+from menu import *
+
 def spawn (temps_mini,intervalle,image,vitesse,time_since_last_spawn,liste_mob= [],liste_shot=[],Shot = 0):
     """Cette fonction fait apparaitre un enemi en fonction des arguments donnés """
     if pygame.time.get_ticks()>=temps_mini+temps_depuis_derniere_mort and pygame.time.get_ticks()>time_since_last_spawn+intervalle:
@@ -37,7 +40,7 @@ def Mouvement(liste,liste_rect,limite,vie,degat =False,bas= True):
         elif i.pos.top <= limite and bas==False :
             liste.pop(0)
     return liste ,liste_rect,vie
-def Collision(rect,liste_rect,liste,vie,degat=False,rect_liste=False,j= 0,liste_2=[],bonus= False, liste_bonus =liste_bonus):
+def Collision(rect,liste_rect,liste,vie,score,degat=False,rect_liste=False,j= 0,liste_2=[],bonus= False, liste_bonus =liste_bonus,point=False):
  """Cette fonction permet de calculer les collisions entre des élements et le cas écheant les supprimer"""
  try:
      liste_supr=[]
@@ -49,6 +52,9 @@ def Collision(rect,liste_rect,liste,vie,degat=False,rect_liste=False,j= 0,liste_
           collision = True
           if rect_liste == True:
                liste_supr_2.append(j)
+          if point== True:
+              score=score+100
+              print(score)
           if bonus == True:
               if randrange(1,30,1) <= 5:
                   liste_bonus.append(liste_rect[hit])
@@ -65,16 +71,16 @@ def Collision(rect,liste_rect,liste,vie,degat=False,rect_liste=False,j= 0,liste_
           for l in range(0,liste_2.count(-42)):
                liste_2.remove(-42)
                if degat== True:
-                   touche.play()
+                    touche.play()
                     vie=vie-1
-          return liste,liste_2,vie,liste_bonus,collision
+          return liste,liste_2,vie,liste_bonus,collision,score
      else:
-          return liste,vie,collision
+          return liste,vie,collision,score
  except:
      if rect_liste == True:
-         return liste,liste_2,vie,liste_bonus,collision
+         return liste,liste_2,vie,liste_bonus,collision,score
      else:
-         return liste,vie,collision
+         return liste,vie,collision,score
 
 def Affichage(liste):
  """Cette fonction permet d'afficher les élements donnés en argument à l'écran"""
@@ -82,7 +88,7 @@ def Affichage(liste):
         fenetre.blit(o.image, o.pos)
 def Init():
     """Fonction qui remet les valeurs initiales des différents elements avant chaque partie"""
-    global Vaisseau_rect,liste_tir,liste_mob,liste_shot,liste_rect_tir,liste_rect_mob,liste_rect_shot,vie,keys,timer,temps,tps_mob,tps_fastmob,tps_shooter,temps_depuis_derniere_mort,liste_rect_heal,liste_rect_shotspeedup,liste_rect_bombe,liste_bonus,liste_heal,liste_shotspeedup,liste_bombe,vitesse_tir
+    global Vaisseau_rect,liste_tir,liste_mob,liste_shot,liste_rect_tir,liste_rect_mob,liste_rect_shot,vie,keys,timer,temps,tps_mob,tps_fastmob,tps_shooter,temps_depuis_derniere_mort,liste_rect_heal,liste_rect_shotspeedup,liste_rect_bombe,liste_bonus,liste_heal,liste_shotspeedup,liste_bombe,vitesse_tir,score
     Vaisseau_rect.left=268
     Vaisseau_rect.top=736
     fenetre.blit(Vaisseau,Vaisseau_rect)
@@ -111,12 +117,89 @@ def Init():
     temps_depuis_derniere_mort=pygame.time.get_ticks()
 
     vitesse_tir = 500
+    score=0
 
     temps=pygame.time.get_ticks()
     tps_mob=pygame.time.get_ticks()
     tps_fastmob=pygame.time.get_ticks()
     tps_shooter=pygame.time.get_ticks()
-    return Vaisseau_rect,liste_tir,liste_mob,liste_shot,liste_rect_tir,liste_rect_mob,liste_rect_shot,vie,keys,timer,temps,tps_mob,tps_fastmob,tps_shooter,temps_depuis_derniere_mort,liste_rect_heal,liste_rect_shotspeedup,liste_rect_bombe,liste_bonus,liste_heal,liste_shotspeedup,liste_bombe,vitesse_tir
+    return Vaisseau_rect,liste_tir,liste_mob,liste_shot,liste_rect_tir,liste_rect_mob,liste_rect_shot,vie,keys,timer,temps,tps_mob,tps_fastmob,tps_shooter,temps_depuis_derniere_mort,liste_rect_heal,liste_rect_shotspeedup,liste_rect_bombe,liste_bonus,liste_heal,liste_shotspeedup,liste_bombe,vitesse_tir,score
+def highscore():
+    fichier = open("score.txt","r")
+    fenetre.blit(fond,(0,0))
+    go_on = 1
+    score_lu=[]
+    for line in fichier:
+       if line.strip():           # line contains eol character(s)
+           try:
+               n = int(line)
+               score_lu.append(n)
+           except ValueError:
+                 pass 
+    
+    score_lu=sorted(score_lu,reverse = True)
+    font = pygame.font.Font(None, 40)
+    
+    
+    o=0
+    while o < len(score_lu) and o <10:
+        
+    
+        texte= int(score_lu[o])
+        texte = str(o+1) +"#  "+ str(texte)
+    
+        ren =font.render(texte,0,(255,255,255))
+        fenetre.blit(ren, (20, 40*o))
+        o=o+1
+    texte =font.render( " Appuyer sur espace pour revenir au menu" ,0,(255,255,255))
+    fenetre.blit(texte,(10,40*11))                   
+    pygame.display.update()
+    while go_on == 1:
+        for event in pygame.event.get():
+            if event.type==KEYDOWN:
+               if event.key==K_SPACE:
+                 go_on=0
+    fichier.close()
+   
+def saveScore(score):
+    fichier = open("score.txt","r+")
+    score_lu=[]
+    font = pygame.font.Font(None, 60)
+    for line in fichier:
+       if line.strip():           # line contains eol character(s)
+           try:
+               n = int(line)
+               score_lu.append(n)
+           except ValueError:
+                 pass 
+    
+    score_lu=sorted(score_lu,reverse = True)
+    o=0
+    fenetre.blit(fond,(0,0))
+    while o < len(score_lu):       
+        if score>= score_lu[o] and o==0:
+            texte =font.render( " New Highscore" ,0,(255,255,255))
+            fenetre.blit(texte,(150,50))
+            texte =font.render( str(score) ,0,(255,255,255))
+            fenetre.blit(texte,(250,100))
+            o = len(score_lu)
+
+            
+        elif score>=score_lu[o]: #LE fichier contient la valeur 0 le score sera donc toujours supérieur ou égal à au moins une valeur du fichier 
+            texte =font.render( " Score:" ,0,(255,255,255))
+            fenetre.blit(texte,(20,20))
+            texte =font.render( str(score) ,0,(255,255,255))
+            fenetre.blit(texte,(200,20))
+            texte =font.render("rang :" + str(o+1),0,(255,255,255))
+            fenetre.blit(texte,(50,80))
+            o = len(score_lu)         
+        o=o+1
+    fichier.write(str(score) +"\n")
+    pygame.display.update()
+    pygame.time.wait(2000)       
+    fichier.close()
+    
+     
 
 class objet:
     """Cette classe définit tout les élements se déplaceant dans le sens vertical"""
