@@ -10,15 +10,16 @@ from Variable_Init import *
 from Fonctions import *
 from menu import *
 pygame.mixer.init()
+pygame.font.init()
+
 continuer=1
-start = 0
 pygame.mixer.music.load("sound/music1.wav")
 pygame.mixer.music.play(-1)
 pygame.mixer.music.set_volume(1.5)
 while continuer==1:
-    start = menu(3)
+    menu()
     #On initialise les variables à leur valeur de départ (cf fonction Init)
-    Vaisseau_rect,liste_tir,liste_mob,liste_shot,liste_rect_tir,liste_rect_mob,liste_rect_shot,vie,keys,timer,temps,tps_mob,tps_fastmob,tps_shooter,temps_depuis_derniere_mort,liste_rect_heal,liste_rect_shotspeedup,liste_rect_bombe,liste_bonus,liste_heal,liste_shotspeedup,liste_bombe,vitesse_tir=Init()
+    Vaisseau_rect,liste_tir,liste_mob,liste_shot,liste_rect_tir,liste_rect_mob,liste_rect_shot,vie,keys,timer,temps,tps_mob,tps_fastmob,tps_shooter,temps_depuis_derniere_mort,liste_rect_heal,liste_rect_shotspeedup,liste_rect_bombe,liste_bonus,liste_heal,liste_shotspeedup,liste_bombe,vitesse_tir,score=Init()
     while vie !=0:
             #On détecte les différents input et on les traite
         for event in pygame.event.get():
@@ -112,25 +113,26 @@ while continuer==1:
         liste_bombe,liste_rect_bombe,vie = Mouvement(liste_bombe,liste_rect_bombe,825,vie,False,True)
                                     ###calcul Collisions###
             #On regarde si il y a collision entre le vaisseau et un tir ennemi , Si il y a collision, le tir ennemi est supprimé
-        liste_shot,vie,collision=Collision(Vaisseau_rect,liste_rect_shot,liste_shot,vie,True)
+        liste_shot,vie,collision,score=Collision(Vaisseau_rect,liste_rect_shot,liste_shot,vie,score,True)
             #On regarde si il y a collision entre le vaisseau et un  ennemi , Si il y a collision, l'ennemi est supprimé
-        liste_mob,vie,collision=Collision(Vaisseau_rect,liste_rect_mob,liste_mob,vie,True)
+        liste_mob,vie,collision,score=Collision(Vaisseau_rect,liste_rect_mob,liste_mob,vie,score,True)
             #On regarde si il y a collision en un tir allié et un enemi ,sil il y a collision l'enemi et letirs sont supprimés
         for j in range (0,len(liste_rect_tir) ):
-            liste_mob,liste_tir,vie,liste_bonus,collision=Collision(liste_rect_tir[j],liste_rect_mob,liste_mob,vie,False,True,j,liste_tir,True,liste_bonus)
+            liste_mob,liste_tir,vie,liste_bonus,collision,score=Collision(liste_rect_tir[j],liste_rect_mob,liste_mob,vie,score,False,True,j,liste_tir,True,liste_bonus,True)
         fenetre.blit(fond, (0,0))
 
             #On regarde si il y a collision entre un heal et le vaisseau,Si il y a collision, le bonus est supprimé et son effet est appliqué    
-        liste_heal,vie,collision = Collision(Vaisseau_rect,liste_rect_heal,liste_heal,vie)
+        liste_heal,vie,collision ,score= Collision(Vaisseau_rect,liste_rect_heal,liste_heal,vie,score)
         if collision == True and vie != 3 :
             vie=vie+1
             #On regarde si il y a collision entre un speedup et le vaisseau,Si il y a collision, le bonus est supprimé et son effet est appliqué
-        liste_shotspeedup,vie,collision = Collision(Vaisseau_rect,liste_rect_shotspeedup,liste_shotspeedup,vie)
+        liste_shotspeedup,vie,collision,score = Collision(Vaisseau_rect,liste_rect_shotspeedup,liste_shotspeedup,vie,score)
         if collision == True  :
             vitesse_tir =vitesse_tir -25
             #On regarde si il y a collision entre une bombe et le vaisseau,Si il y a collision, le bonus est supprimé et son effet est appliqué
-        liste_bombe,vie,collision = Collision(Vaisseau_rect,liste_rect_bombe,liste_bombe,vie)
+        liste_bombe,vie,collision,score = Collision(Vaisseau_rect,liste_rect_bombe,liste_bombe,vie,score)
         if collision == True :
+            score =score+ len(liste_mob)*100
             liste_mob=[]
             liste_shot= []
             liste_rect_mob=[]
@@ -150,16 +152,14 @@ while continuer==1:
             fenetre.blit(heart, (555,780))
         if vie >= 1:
             fenetre.blit(heart, (530,780))
+        #On affiche le score
+        font = pygame.font.Font(None, 40)
+        ren = font.render(str (score),0,(255,255,255))
+        fenetre.blit(ren, (5, 1))
         
         fenetre.blit(Vaisseau,Vaisseau_rect)    
         pygame.display.update()
         clock=timer.tick(60) #Limite les FPS à 60
     #Cette partie est excutée lorsque le vaiseeau n'a plus de vie
     mort.play()
-    """
-    fenetre.blit(fond, (0,0))
-    fenetre.blit(GameOver,(0,0))
-    pygame.display.update()"""
-    
-    
-        
+    saveScore(score)
