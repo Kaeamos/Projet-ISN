@@ -2,19 +2,22 @@
 import pygame
 from pygame.locals import *
 from Variable_Init import *
+from Fonctions import *
 
-def menu (fleche):
+def menu ():
+    from Fonctions import highscore
     start = 0
+    fleche= 3
     while start != 1:
         fenetre.blit(menu_fond,(0,0))
         for event in pygame.event.get():
             if event.type==KEYDOWN:
                 if event.key == K_w and fleche !=3:
                     fleche = fleche+1
-                    bip.play()
+                    menubip.play()
                 if event.key == K_s and fleche !=1:
                     fleche = fleche-1
-                    bip.play()
+                    menubip.play()
                 if event.key == K_SPACE:
                     start = 2
         if fleche == 3:
@@ -30,17 +33,10 @@ def menu (fleche):
             start = 1
             gong.play()
         if fleche == 2 and start == 2:
-            patate = 0
+            
+            score_lu = highscore()
+            start=-1
         if fleche == 1 and start == 2:
             pygame.quit
             exit()
         pygame.display.update()
-    return start
-        
-        
-
-
-
-
-
-
