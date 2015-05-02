@@ -76,6 +76,8 @@ liste_rect_shotspeedup =[]
 liste_rect_bombe=[]
 
 fleche = 3
+score=0
+fichier = open("score.txt","r+")
 #On défini le nombre de vie de base
 vie = 3
 #On charge les bruitages
@@ -92,7 +94,8 @@ laser.set_volume(0.3)
 touche.set_volume(0.3)
 bip.set_volume(0.3)
 touche_enemi.set_volume(0.3)
-
+#On initialise le module font :
+font = pygame.font.SysFont('monospace', 12)
 
 keys = [False, False, False]
 timer=pygame.time.Clock()
