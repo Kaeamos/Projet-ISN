@@ -54,7 +54,7 @@ def Collision(rect,liste_rect,liste,vie,score,degat=False,rect_liste=False,j= 0,
                liste_supr_2.append(j)
           if point== True:
               score=score+100
-              print(score)
+              
           if bonus == True:
               if randrange(1,30,1) <= 5:
                   liste_bonus.append(liste_rect[hit])
