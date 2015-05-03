@@ -82,7 +82,6 @@ liste_rect_shotspeedup =[]
 liste_rect_bombe=[]
 
         #Initialisation des valeurs de base de certaines variables#
-fleche = 3
 score=0
 vie = 3
 keys = [False, False, False]
