@@ -4,67 +4,111 @@ from Variable_Init import *
 from random import *
 from pygame.locals import *
 from menu import *
+"""Ce dossier contient toutes les fonctions nécessaires au jeu"""
+"""Il contient aussi le class qui définit ce qu'est un objet"""
 
 def spawn (temps_mini,intervalle,image,vitesse,time_since_last_spawn,liste_mob= [],liste_shot=[],Shot = 0):
-    """Cette fonction fait apparaitre un enemi en fonction des arguments donnés """
+    """Cette fonction fait apparaitre un ennemi en fonction des arguments donnés """
+    #On s'assure que le monstre n'est pas apparu trop récemment#
     if pygame.time.get_ticks()>=temps_mini+temps_depuis_derniere_mort and pygame.time.get_ticks()>time_since_last_spawn+intervalle:
+        #Si il peut spawner, on réinitialise son temps de dernière apparition#
         time_since_last_spawn=pygame.time.get_ticks()
+        
+        #On donne au monstre (ou mob) des coordonnées horizontales aléatoires#
         position_mob = randrange(20,516,42)
+        
+        #On crée le monstre et on lui donne les arguments donnés à la fonction#
         monstre = objet(image,0,vitesse,position_mob)
+        #On ajoute le monstre ainsi créé à la liste des coordonnées de monstres#
         liste_mob.append(monstre)
+        
+        #On vérifie si le mob est un mob qui tire#
         if Shot == 1:
+            #Si le mob est un tireur, on le fait tirer à son apparition#
             shooter_shot = objet(image_shot,0,4,position_mob+45)
             liste_shot.append(shooter_shot)
         elif Shot == 2:
             shooter_shot = objet(image_shot2,0,5,position_mob+32)
             liste_shot.append(shooter_shot)
+            
+    #On renvoie les valeurs dont on a besoin#
     return liste_mob , liste_shot ,time_since_last_spawn
 
 def Mouvement(liste,liste_rect,limite,vie,degat =False,bas= True):
     """Cette fonction permet de faire bouger tout les élements à l'écran à l'exception du vaisseau"""
+    #On réinitialise la liste des hitbox de l'élément voulu
     liste_rect=[]
+    
     for i in liste:
+        #On utilise la fonction "move" du class pour faire bouger tous les éléments de la liste#
         i.move()
+        #Et on rajoute leur hitbox dans la liste#
         liste_rect.append(i.pos)
+
+        #On vérifie au passage si l'élément est un ennemi qui est arrivé en bas de l'écran#
         if i.pos.top >= limite and bas==True and degat ==True:
+            #Si c'est le cas, il disparait et le joueur perd un point de vie#
             touche.play
             vie=vie-1
             liste.pop(0)
-           
+
+        #On vérifie aussi si l'élément est un projectile ennemi ou un bonus arrivé en bas de l'écran#   
         elif i.pos.top >=limite and bas==True:
+            #Auquel cas il disparait sans faire perdre de point de vie#
             liste.pop(0)
+            
+        #En théorie les ennemis n'iront pas en haut. Cette fonction est ici au cas où le jeu soit continué#
         elif i.pos.top <= limite and bas==False and degat==True:
             touche.play
             vie=vie-1
             liste.pop(0)
+
+        #On fait aussi disparaitre les tirs du vaisseau arrivés en haut de l'écran#
         elif i.pos.top <= limite and bas==False :
             liste.pop(0)
+
+    #On renvoie les valeurs nécessaires#
     return liste ,liste_rect,vie
+
+
 def Collision(rect,liste_rect,liste,vie,score,degat=False,rect_liste=False,j= 0,liste_2=[],bonus= False, liste_bonus =liste_bonus,point=False):
  """Cette fonction permet de calculer les collisions entre des élements et le cas écheant les supprimer"""
  try:
+     #On réinitialise les listes de suppressions d'éléments et la collision#
      liste_supr=[]
      liste_supr_2=[]
      collision = False
+#Cette ligne teste une collision entre tous les objets de deux listes#
      hit = rect.collidelist(liste_rect)
+#Si il n'y a pas de collision, la fonction renvoie -1 à la valeur hit#
+#Sinon elle renvoie l'index de l'objet touché#
      if hit != -1:
+          #Si collision il y a, on ajoute l'index de l'élément touché à la liste de suppression#
           liste_supr.append(hit)
-          collision = True
+          collision = True #On précise qu'il y a eu collision dans cette variable#
+          
           if rect_liste == True:
+               #Si il y a test de collision entre deux liste et pas un élément et une liste, on ajoute l'index de l'élément voulu dans une deuxieme liste#
                liste_supr_2.append(j)
+               
           if point== True:
+              #Si l'élément rapporte des points, on augmente le score du joueur#
               score=score+100
               
           if bonus == True:
+              #Si l'élément peut drop des bonus, on teste pour savoir si un bonus tombe#
               if randrange(1,30,1) <= 5:
                   liste_bonus.append(liste_rect[hit])
+
+     #On supprime les éléments impliqués dans la collision#
      for l in range(0,len(liste_supr)):
           liste[liste_supr[l]]=-42
      for l in range(0,liste.count(-42)):
           liste.remove(-42)
           if degat== True:
+               #Si il y a collision entre le vaisseau et un élément de dégât, on enlève un point de vie#
                vie=vie-1
-               touche.play()
+               touche.play() #Son de perte de point de vie#
      if rect_liste==True:
           for l in range(0,len(liste_supr_2)):
                liste_2[liste_supr_2[l]]=-42
@@ -73,6 +117,8 @@ def Collision(rect,liste_rect,liste,vie,score,degat=False,rect_liste=False,j= 0,
                if degat== True:
                     touche.play()
                     vie=vie-1
+
+          #On renvoie les valeurs dont on a besoin#
           return liste,liste_2,vie,liste_bonus,collision,score
      else:
           return liste,vie,collision,score
@@ -84,18 +130,24 @@ def Collision(rect,liste_rect,liste,vie,score,degat=False,rect_liste=False,j= 0,
 
 def Affichage(liste):
  """Cette fonction permet d'afficher les élements donnés en argument à l'écran"""
+ #On affiche à la suite tous les éléments d'une liste#
  for o in liste:
         fenetre.blit(o.image, o.pos)
 def Init():
     """Fonction qui remet les valeurs initiales des différents elements avant chaque partie"""
+    #La fonction global permet à python d'aller chercher les valeurs dans tout le dossier#
     global Vaisseau_rect,liste_tir,liste_mob,liste_shot,liste_rect_tir,liste_rect_mob,liste_rect_shot,vie,keys,timer,temps,tps_mob,tps_fastmob,tps_shooter,temps_depuis_derniere_mort,liste_rect_heal,liste_rect_shotspeedup,liste_rect_bombe,liste_bonus,liste_heal,liste_shotspeedup,liste_bombe,vitesse_tir,score
+
+    #On réinitialise le vaisseau et on le réaffiche#
     Vaisseau_rect.left=268
     Vaisseau_rect.top=736
     fenetre.blit(Vaisseau,Vaisseau_rect)
-    #On reset toute les listes
+    
+    #On reset toute les listes#
     liste_tir =[]
     liste_mob =[]
     liste_shot =[]
+    
     liste_rect_tir=[]
     liste_rect_mob=[]
     liste_rect_shot=[]
@@ -103,16 +155,19 @@ def Init():
     liste_rect_heal =[]
     liste_rect_shotspeedup =[]
     liste_rect_bombe=[]
+    
     liste_bonus = []
     liste_heal= []
     liste_shotspeedup=[]
     liste_bombe = []
     
-    #On remet le nombre de vie
+    #On remet le nombre de points de vie à 3#
     vie = 3
-    #On reset les inputs
+    
+    #On reset les inputs du joueur#
     keys = [False, False, False]
 
+    #On reset le temps et certaines variables#
     timer=pygame.time.Clock()
     temps_depuis_derniere_mort=pygame.time.get_ticks()
 
@@ -123,8 +178,12 @@ def Init():
     tps_mob=pygame.time.get_ticks()
     tps_fastmob=pygame.time.get_ticks()
     tps_shooter=pygame.time.get_ticks()
+
+    #On renvoie toutes les valeurs initialisées au programme#
     return Vaisseau_rect,liste_tir,liste_mob,liste_shot,liste_rect_tir,liste_rect_mob,liste_rect_shot,vie,keys,timer,temps,tps_mob,tps_fastmob,tps_shooter,temps_depuis_derniere_mort,liste_rect_heal,liste_rect_shotspeedup,liste_rect_bombe,liste_bonus,liste_heal,liste_shotspeedup,liste_bombe,vitesse_tir,score
+
 def highscore():
+    
     fichier = open("score.txt","r")
     fenetre.blit(fond,(0,0))
     go_on = 1
