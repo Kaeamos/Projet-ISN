@@ -3,40 +3,50 @@ import pygame
 from pygame.locals import *
 from Variable_Init import *
 from Fonctions import *
+"""Ce dossier permet l'affichage du menu en début de partie et après une mort du joueur"""
+"""Il s'agit d'une unique fonction qui permet de lancer le jeu ou d'afficher les scores"""
 
 def menu ():
     from Fonctions import highscore
+    #On initialise certaines variables#
     start = 0
     fleche= 3
+    
+    #Boucle du menu dont on sort en sélectionnant une option#
     while start != 1:
+        #Affichage du fond du menu#
         fenetre.blit(menu_fond,(0,0))
+        #On teste la pression d'une touche du clavier#
         for event in pygame.event.get():
             if event.type==KEYDOWN:
+                #Si une touche est pressée, on change les variables en fonction de la touche#
                 if event.key == K_w and fleche !=3:
-                    fleche = fleche+1
-                    menubip.play()
+                    fleche = fleche+1 #On fait monter la flèche si elle n'est pas en haut#
+                    menubip.play() #Cette ligne joue un son#
                 if event.key == K_s and fleche !=1:
                     fleche = fleche-1
                     menubip.play()
                 if event.key == K_SPACE:
                     start = 2
+                    
+#Si on appuie sur espace, cela déclenche une séquence de if qui regarde où est la flèche#
+        if fleche == 3 and start == 2:
+            fenetre.blit(Vaisseau,Vaisseau_rect)
+            start = 1 #Le jeu démarre si start = 1#
+            gong.play()
+        if fleche == 2 and start == 2: 
+            score_lu = highscore()
+            start=-1
+        if fleche == 1 and start == 2:
+            pygame.quit
+            exit() #Le jeu se ferme#
+
+        #On affiche la flèche au bon endroit selon sa position#
         if fleche == 3:
             fenetre.blit(image_fleche,(140,325))
         if fleche == 2:
             fenetre.blit(image_fleche,(130,385))
         if fleche == 1:
             fenetre.blit(image_fleche,(225,443))
-
-            
-        if fleche == 3 and start == 2:
-            fenetre.blit(Vaisseau,Vaisseau_rect)
-            start = 1
-            gong.play()
-        if fleche == 2 and start == 2:
-            
-            score_lu = highscore()
-            start=-1
-        if fleche == 1 and start == 2:
-            pygame.quit
-            exit()
+        #On actualise l'écran pour voir la flèche#
         pygame.display.update()
