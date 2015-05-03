@@ -1,33 +1,44 @@
 # -*- coding: utf8 -*-
 
+#On importe toutes les bibliothèques et les dossiers nécessaires au fonctionnement#
 import pygame
 from pygame.locals import *
 import traceback
 from random import *
-pygame.mixer.pre_init(44100, -16, 2, 2048)
+pygame.mixer.pre_init(44100, -16, 2, 2048) #On initialise le mixeur de sons#
 pygame.init()
 from Variable_Init import *
 from Fonctions import *
 from menu import *
 pygame.mixer.init()
-pygame.font.init()
+pygame.font.init() #Initialisation de la police pour afficher le texte#
 
+""" Ce dossier est le corps principal du programme. Il contient la boucle de jeu"""
+#On initialise la variable qui va faire boucler le jeu à chaque frame#
 continuer=1
+
+#Initialisation de la musique et de son volume#
 pygame.mixer.music.load("sound/music1.wav")
 pygame.mixer.music.play(-1)
 pygame.mixer.music.set_volume(1.5)
+
+#Ceci est la boucle du jeu. A chaque frame (chaque image) du jeu, toute cette boucle s'effectue#
 while continuer==1:
+    #On lance le menu via le dossier menu#
     menu()
-    #On initialise les variables à leur valeur de départ (cf fonction Init)
+    
+    #On initialise les variables à leur valeur de départ via le dossier Variable_init et la fonction Init()#
     Vaisseau_rect,liste_tir,liste_mob,liste_shot,liste_rect_tir,liste_rect_mob,liste_rect_shot,vie,keys,timer,temps,tps_mob,tps_fastmob,tps_shooter,temps_depuis_derniere_mort,liste_rect_heal,liste_rect_shotspeedup,liste_rect_bombe,liste_bonus,liste_heal,liste_shotspeedup,liste_bombe,vitesse_tir,score=Init()
+
+    #Ceci est la boucle secondaire du programme. Une fois le jeu lancé, il continue tant que le joueur a des points de vie#
     while vie !=0:
-            #On détecte les différents input et on les traite
+            #On détecte les différents input et on les traite#
         for event in pygame.event.get():
-            #moyen pour sortir de la boucle
             if event.type==QUIT:
-                pygame.quit()
+                pygame.quit() #Le jeu quitte si on appuie sur la croix rouge de la fenetre#
                 exit()
             if event.type==KEYDOWN:
+                #Si une touche est enfoncée, on change les variables de la liste des input#
                 if event.key==K_a:
                     keys[0]=True           
                 if event.key==K_d:
@@ -35,16 +46,20 @@ while continuer==1:
                 if event.key==K_w:
                     keys[2]=True
                 if event.key==K_ESCAPE:
-                    pygame.quit()
+                    pygame.quit() #Le jeu quitte si on appuie sur Echap#
                     exit()
-            if event.type==KEYUP: 
+                    
+            if event.type==KEYUP:
+                #Si une touche n'est plus enfoncée, on rechange les variables de la liste#
                 if event.key==K_a:
                     keys[0]=False
                 if event.key==K_d:
                     keys[1]=False
                 if event.key==K_w:
                     keys[2]=False
-            #On effectue les actions associées à chaque touche
+                    
+            #On effectue les actions associées à chaque touche#
+        #Mouvement du vaisseau#       
         if keys[0]:
             Vaisseau_rect=Vaisseau_rect.move(-7,0)
             if Vaisseau_rect.left<0:
@@ -53,19 +68,30 @@ while continuer==1:
             Vaisseau_rect=Vaisseau_rect.move(7,0)
             if Vaisseau_rect.right>600:
                 Vaisseau_rect.right=600
+                
+        #Création de tirs du vaisseau#        
         if keys[2]:
+            #On vérifie que le vaisseau n'aie pas tiré trop récemment avant de créer le tir#
             if pygame.time.get_ticks()>= temps+vitesse_tir:
-                    laser.play()
-                    temps=pygame.time.get_ticks()
+                    laser.play() #Joue le son du tir#
+                    temps=pygame.time.get_ticks() #Reset du temps de "cooldown" des tirs#
+                    #On crée le tir et on l'ajoute à la liste de coordonnées de tirs#
                     o = objet(tir,736, -10,Vaisseau_rect.left +32)
                     liste_tir.append(o)
+
+                    
                                         ###Spawn des mobs###
-            #Spawn du tireur
+                    #On envoie à chaque fois les données (vitesse, taille, image, etc.)
+                    #A la fonction spawn (voir dossier Fonctions) qui les fait apparaitre#
+
+            #Spawn du gros tireur vert#
         liste_mob,liste_shot,tps_shooter = spawn(100,10000,image_shooter,1,tps_shooter,liste_mob,liste_shot,1)
-            #Spawn du mob rapide
+
+            #Spawn du petit rapide bleu#
         liste_mob,liste_shot,tps_fastmob = spawn(15000,5000,image_fastmob,5,tps_fastmob,liste_mob,liste_shot)
-            #Spawn des mobs classiques
-        random_tir_mob=randrange(1,10,1)
+
+            #Spawn des mobs classiques#     
+        #On donne au mob classique un sprite aléatoire choisi entre 3 différents#
         random_image_mob=randrange(1,6,1)
         if random_image_mob==1:  
             image_mob = mob1
@@ -73,13 +99,19 @@ while continuer==1:
             image_mob = mob2
         else:
             image_mob = mob3
+
+        #Le mob à une petite chance de tirer un missile#
+        random_tir_mob=randrange(1,10,1)
         if random_tir_mob <= 8:
             liste_mob,liste_shot,tps_mob = spawn(5000,1200,image_mob,3,tps_mob,liste_mob,liste_shot)
         else:
             liste_mob,liste_shot,tps_mob = spawn(5000,1200,image_mob,2,tps_mob,liste_mob,liste_shot,2)
-            #spawn des bonus
+
+            #Spawn des bonus#
         for i in liste_bonus:
+            #Quand un bonus est créé, il est choisi aléatoirement entre une vie, une bombe et une amélioration de tir#
             random_bonus = randrange(1,10,1)
+            
             if random_bonus <= 2:
                 k = objet(image_heal,i.top,6,i.left +13)
                 liste_heal.append(k)
@@ -94,29 +126,36 @@ while continuer==1:
                 
         liste_bonus = []
         
+        
                                       ###Mouvement des mobs###
-
+            #On utilise la fonction Mouvement (voir dossier Fonctions) pour bouger les monstres#
         liste_mob,liste_rect_mob,vie = Mouvement(liste_mob,liste_rect_mob,832,vie,True)
         
                                       ###Mouvement des tirs###      
-            #Tirs enemi
+            #De même, on utilise la fonction Mouvement pour bouger les tirs ennemis#
         liste_shot,liste_rect_shot,vie= Mouvement(liste_shot,liste_rect_shot,830,vie)
-            #Tirs allié
+        
+            #Puis les tirs alliés
         liste_tir,liste_rect_tir,vie = Mouvement(liste_tir,liste_rect_tir,-16,vie,False,False)
 
-                                    ###Mouvement des bonus###
-        #heal
+                                      ###Mouvement des bonus###
+            #Mouvement des bonus de vie#
         liste_heal,liste_rect_heal,vie = Mouvement(liste_heal,liste_rect_heal,825,vie,False,True)
-        #Shotspeedup
+
+            #Mouvement des améliorations de tir#
         liste_shotspeedup,liste_rect_shotspeedup,vie = Mouvement(liste_shotspeedup,liste_rect_shotspeedup,825,vie,False,True)
-        #bombe
+
+            #Mouvement des bonus bombes#
         liste_bombe,liste_rect_bombe,vie = Mouvement(liste_bombe,liste_rect_bombe,825,vie,False,True)
-                                    ###calcul Collisions###
+
+                                      ###Calcul des Collisions###
             #On regarde si il y a collision entre le vaisseau et un tir ennemi , Si il y a collision, le tir ennemi est supprimé
         liste_shot,vie,collision,score=Collision(Vaisseau_rect,liste_rect_shot,liste_shot,vie,score,True)
+
             #On regarde si il y a collision entre le vaisseau et un  ennemi , Si il y a collision, l'ennemi est supprimé
         liste_mob,vie,collision,score=Collision(Vaisseau_rect,liste_rect_mob,liste_mob,vie,score,True)
-            #On regarde si il y a collision en un tir allié et un enemi ,sil il y a collision l'enemi et letirs sont supprimés
+
+            #On regarde si il y a collision en un tir allié et un enemi ,sil il y a collision l'ennemi et le tir sont supprimés
         for j in range (0,len(liste_rect_tir) ):
             liste_mob,liste_tir,vie,liste_bonus,collision,score=Collision(liste_rect_tir[j],liste_rect_mob,liste_mob,vie,score,False,True,j,liste_tir,True,liste_bonus,True)
         fenetre.blit(fond, (0,0))
@@ -124,14 +163,17 @@ while continuer==1:
             #On regarde si il y a collision entre un heal et le vaisseau,Si il y a collision, le bonus est supprimé et son effet est appliqué    
         liste_heal,vie,collision ,score= Collision(Vaisseau_rect,liste_rect_heal,liste_heal,vie,score)
         if collision == True and vie != 3 :
-            vie=vie+1
+            vie=vie+1 #Le joueur gagne une vie (sauf si il en a déjà 3)#
+
             #On regarde si il y a collision entre un speedup et le vaisseau,Si il y a collision, le bonus est supprimé et son effet est appliqué
         liste_shotspeedup,vie,collision,score = Collision(Vaisseau_rect,liste_rect_shotspeedup,liste_shotspeedup,vie,score)
         if collision == True  :
-            vitesse_tir =vitesse_tir -25
+            vitesse_tir =vitesse_tir -25 #L'écart de temps entre les tirs est réduit#
+
             #On regarde si il y a collision entre une bombe et le vaisseau,Si il y a collision, le bonus est supprimé et son effet est appliqué
         liste_bombe,vie,collision,score = Collision(Vaisseau_rect,liste_rect_bombe,liste_bombe,vie,score)
         if collision == True :
+            #Tous les éléments ennemis sont détruits et on gagne du score en fonction#
             score =score+ len(liste_mob)*100
             liste_mob=[]
             liste_shot= []
@@ -140,26 +182,35 @@ while continuer==1:
             
         
                             ###On affiche les élements à l'écran###
+            #On utilise la fonction Affichage (voir dossier Fonctions) pour afficher toutes les listes d'objets#
         Affichage(liste_tir)            
         Affichage(liste_mob)
         Affichage(liste_shot)
         Affichage(liste_heal)
         Affichage(liste_shotspeedup)
         Affichage(liste_bombe)
+
+            #On affiche les coeurs en fonctions du nombre de points de vie#
         if vie >= 3:
             fenetre.blit(heart, (580,780))
         if vie >= 2:
             fenetre.blit(heart, (555,780))
         if vie >= 1:
             fenetre.blit(heart, (530,780))
-        #On affiche le score
+            
+            #On affiche le score en haut à gauche#
         font = pygame.font.Font(None, 40)
         ren = font.render(str (score),0,(255,255,255))
         fenetre.blit(ren, (5, 1))
+
+            #On affiche le vaisseau#
+        fenetre.blit(Vaisseau,Vaisseau_rect)
         
-        fenetre.blit(Vaisseau,Vaisseau_rect)    
+            #On actualise l'écran, sans quoi rien ne s'affiche#
         pygame.display.update()
-        clock=timer.tick(60) #Limite les FPS à 60
-    #Cette partie est excutée lorsque le vaiseeau n'a plus de vie
+        
+        clock=timer.tick(60) #Limite les FPS (frames par seconde) à 60#
+        
+    #Cette partie est excutée lorsque le vaiseeau n'a plus de vie (car en dehors de la boucle secondaire)#
     mort.play()
     saveScore(score)
