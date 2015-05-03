@@ -1,23 +1,25 @@
 # -*- coding: utf8 -*-
 import pygame
 """Ce dossier contiens toute les valeurs par défaut des variables utilisées"""
-"""On réinitialise ces variables à chaque début de partie en faisant appel à la fonction Init"""
+"""On réinitialise ces variables à chaque début de partie en faisant appel à la fonction Init()"""
 
-#Ouverture de la fenêtre Pygame
+        #Ouverture de la fenêtre Pygame#
 fenetre = pygame.display.set_mode((600,800))
-#Chargement et collage du fond
+        #Chargement des fonds d'écran(menu,jeu,game over)#
 menu_fond = pygame.image.load("img/menu.jpg").convert()
 fond = pygame.image.load("img/background1.jpg").convert()
 GameOver= pygame.image.load("img/GameOver.png").convert_alpha()
-#Chargement et collage du vaisseau
+        #Chargement du sprite (de l'image) du vaisseau#
 Vaisseau=pygame.image.load("img/Vaisseau.png").convert_alpha()
-Vaisseau_rect=Vaisseau.get_rect()
-
+Vaisseau_rect=Vaisseau.get_rect() #Cette ligne donne au vaisseau une "hitbox"(rectangle reconnu par la console pour les collisions)
+        #Chargement des coordonnées de départ du vaisseau#
 Vaisseau_rect.left=268
 Vaisseau_rect.top=736
+        #Chargement de la vitesse initiale des tirs du vaisseau#
 vitesse_tir =500
 
-#Chargement des sprites de mobs
+        #Chargement des sprites des monstres#
+        #Le "convert_alpha()" permet d'afficher la transparence des .png"
 mob1=pygame.image.load("img/mob1.png").convert_alpha()
 mob1_rect=mob1.get_rect()
 
@@ -33,12 +35,14 @@ image_fastmob_rect=image_fastmob.get_rect()
 image_shooter=pygame.image.load("img/shooter.png").convert_alpha()
 image_shooter_rect=image_shooter.get_rect()
 
+        #Chargement des sprites des tirs ennemis#
 image_shot=pygame.image.load("img/shooter_tir.png").convert_alpha()
 image_shot_rect=image_shot.get_rect()
 
 image_shot2=pygame.image.load("img/shooter_tir2.png").convert_alpha()
 image_shot2_rect=image_shot2.get_rect()
 
+        #Chargement des sprites des bonus#
 image_heal=pygame.image.load("img/coeur.png").convert()
 image_heal_rect=image_heal.get_rect()
 
@@ -48,39 +52,51 @@ image_shotspeedup_rect=image_shotspeedup.get_rect()
 image_bombe=pygame.image.load("img/bombe.png").convert()
 image_bombe_rect=image_bombe.get_rect()
 
-#Chargement des Coeurs
+        #Chargement de l'image de coeurs pour les points de vie#
 heart=pygame.image.load("img/HP.png").convert_alpha()
 
+        #Chargement de l'image de fleche du menu#
 image_fleche = pygame.image.load("img/fleche.png").convert_alpha()
 
-#Chargement du tir
+        #Chargement du sprite du tir du vaisseau#
 tir=pygame.image.load("img/tir.png").convert_alpha()
 tir_rect=tir.get_rect()
-#on crée des listes qui contiendront les coordonnées du tir et des mobs
+
+        #Création de listes qui contiendront les coordonnées des monstres et des tirs#
 liste_tir =[]
 liste_mob =[]
 liste_shot =[]
-
+        #Création de listes qui contiendront les coordonnées des bonus#
 liste_bonus = []
 liste_heal= []
 liste_shotspeedup=[]
 liste_bombe = []
 
-#On initialise la liste des Hitbox des mobs ET des tirs et de leurs suppressions
+        #Création de la liste des Hitbox des mobs et des tirs#
 liste_rect_tir=[]
 liste_rect_mob=[]
 liste_rect_shot=[]
-
+        #Création de la liste des Hitbox des bonus#
 liste_rect_heal =[]
 liste_rect_shotspeedup =[]
 liste_rect_bombe=[]
 
+        #Initialisation des valeurs de base de certaines variables#
 fleche = 3
 score=0
-fichier = open("score.txt","r+")
-#On défini le nombre de vie de base
 vie = 3
-#On charge les bruitages
+keys = [False, False, False]
+temps_depuis_derniere_mort=0
+temps=0
+tps_mob=0
+tps_fastmob=0
+tps_shooter=0
+
+
+        #Assignation du fichier des highscores à une variable#
+fichier = open("score.txt","r+")
+
+        #Chargement des bruitages et de leur volume
 laser = pygame.mixer.Sound("sound/laser.wav")
 mort = pygame.mixer.Sound("sound/mort.wav")
 touche = pygame.mixer.Sound("sound/touche.wav")
@@ -88,21 +104,18 @@ touche_enemi = pygame.mixer.Sound("sound/touche_enemi.wav")
 bip = pygame.mixer.Sound("sound/bip.wav")
 gong = pygame.mixer.Sound("sound/gong.wav")
 menubip = pygame.mixer.Sound("sound/menubip.wav")
+
 menubip.set_volume(0.4)
 gong.set_volume(0.5)
 laser.set_volume(0.3)
 touche.set_volume(0.3)
 bip.set_volume(0.3)
 touche_enemi.set_volume(0.3)
-#On initialise le module font :
+
+        #Initialisation du menu font :
 font = pygame.font.SysFont('monospace', 12)
 
-keys = [False, False, False]
+        #Initialisation du temps comme variable
 timer=pygame.time.Clock()
 
-temps_depuis_derniere_mort=0
-temps=0
-tps_mob=0
-tps_fastmob=0
-tps_shooter=0
 
