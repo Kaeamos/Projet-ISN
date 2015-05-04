@@ -183,37 +183,37 @@ def Init():
     return Vaisseau_rect,liste_tir,liste_mob,liste_shot,liste_rect_tir,liste_rect_mob,liste_rect_shot,vie,keys,timer,temps,tps_mob,tps_fastmob,tps_shooter,temps_depuis_derniere_mort,liste_rect_heal,liste_rect_shotspeedup,liste_rect_bombe,liste_bonus,liste_heal,liste_shotspeedup,liste_bombe,vitesse_tir,score
 
 def highscore():
-    
-    fichier = open("score.txt","r")
+    """Cette fonction affiche les 10 meilleurs scores elle est appellée lorsqu'on sélectionne highscore dans le menu"""    
+    fichier = open("score.txt","r") #On ouvre le fichier des scores
     fenetre.blit(fond,(0,0))
     go_on = 1
     score_lu=[]
-    for line in fichier:
-       if line.strip():           # line contains eol character(s)
+    for line in fichier: #On parcoure le fichier
+       if line.strip():           # On détecte si il s'agit d'une nouvelle ligne dans le fichier
            try:
                n = int(line)
-               score_lu.append(n)
+               score_lu.append(n) #On ajoute à la liste des scores la valeur lu dans le fichier
            except ValueError:
                  pass 
     
-    score_lu=sorted(score_lu,reverse = True)
-    font = pygame.font.Font(None, 40)
+    score_lu=sorted(score_lu,reverse = True) #On trie par ordre décroissant les scores
+    font = pygame.font.Font(None, 40) #On sélectionne la police d'écriture
     
     
     o=0
-    while o < len(score_lu) and o <10:
+    while o < len(score_lu) and o <10: #On lis les dix premier scores de la liste soit les dix meilleurs
         
     
         texte= int(score_lu[o])
-        texte = str(o+1) +"#  "+ str(texte)
+        texte = str(o+1) +"#  "+ str(texte) #On crée le tecte à afficher ici le score et son rang
     
-        ren =font.render(texte,0,(255,255,255))
-        fenetre.blit(ren, (20, 40*o))
+        ren =font.render(texte,0,(255,255,255)) #On crée une image avec le texte
+        fenetre.blit(ren, (20, 40*o)) #On affiche l'image
         o=o+1
     texte =font.render( " Appuyer sur espace pour revenir au menu" ,0,(255,255,255))
     fenetre.blit(texte,(10,40*11))                   
     pygame.display.update()
-    while go_on == 1:
+    while go_on == 1: #On attend que l'utilisateur appuie sur espace pour revenir au menu
         for event in pygame.event.get():
             if event.type==KEYDOWN:
                if event.key==K_SPACE:
@@ -221,41 +221,42 @@ def highscore():
     fichier.close()
    
 def saveScore(score):
-    fichier = open("score.txt","r+")
+    """Cette fonction sauvegarde le score du jouer à la fin d'une partie et détermine son rang"""
+    fichier = open("score.txt","r+")#On ouvre le fichier des scores
     score_lu=[]
-    font = pygame.font.Font(None, 60)
-    for line in fichier:
-       if line.strip():           # line contains eol character(s)
+    font = pygame.font.Font(None, 60)#On sélectionne la police d'écriture
+    for line in fichier: #On parcoure le fichier
+       if line.strip(): # On détecte si il s'agit d'une nouvelle ligne dans le fichier          
            try:
                n = int(line)
-               score_lu.append(n)
+               score_lu.append(n)#On ajoute à la liste des scores la valeur lu dans le fichier
            except ValueError:
                  pass 
     
-    score_lu=sorted(score_lu,reverse = True)
+    score_lu=sorted(score_lu,reverse = True)#On trie par ordre décroissant les scores
     o=0
     fenetre.blit(fond,(0,0))
-    while o < len(score_lu):       
-        if score>= score_lu[o] and o==0:
-            texte =font.render( " New Highscore" ,0,(255,255,255))
+    while o < len(score_lu):    #On lis tous les scores   
+        if score>= score_lu[o] and o==0: #Si le score du joeur est supérieur au meilleur score enregistré
+            texte =font.render( " New Highscore" ,0,(255,255,255)) #On affiche New Highscore
             fenetre.blit(texte,(150,50))
-            texte =font.render( str(score) ,0,(255,255,255))
+            texte =font.render( str(score) ,0,(255,255,255))#On affiche le score
             fenetre.blit(texte,(250,100))
-            o = len(score_lu)
+            o = len(score_lu)#On termine la boucle
 
             
-        elif score>=score_lu[o]: #LE fichier contient la valeur 0 le score sera donc toujours supérieur ou égal à au moins une valeur du fichier 
-            texte =font.render( " Score:" ,0,(255,255,255))
+        elif score>=score_lu[o]: #Le fichier contient la valeur 0 le score sera donc toujours supérieur ou égal à au moins une valeur du fichier 
+            texte =font.render( " Score:" ,0,(255,255,255))#On affiche score:
             fenetre.blit(texte,(20,20))
-            texte =font.render( str(score) ,0,(255,255,255))
+            texte =font.render( str(score) ,0,(255,255,255))#On affiche le score
             fenetre.blit(texte,(200,20))
-            texte =font.render("rang :" + str(o+1),0,(255,255,255))
+            texte =font.render("rang :" + str(o+1),0,(255,255,255))#On affiche le rang du joueur (il correspond à la valeur de o
             fenetre.blit(texte,(50,80))
-            o = len(score_lu)         
+            o = len(score_lu)#On termine la boucle         
         o=o+1
-    fichier.write(str(score) +"\n")
-    pygame.display.update()
-    pygame.time.wait(2000)       
+    fichier.write(str(score) +"\n")#On enregistre le score dans le fichier
+    pygame.display.update()#On actualise l'écran
+    pygame.time.wait(2000) #On attend 2 sec puis on reviens au menu      
     fichier.close()
     
      
@@ -263,10 +264,10 @@ def saveScore(score):
 class objet:
     """Cette classe définit tout les élements se déplaceant dans le sens vertical"""
     def __init__(self, image, hauteur, vitesse,x):
-        self.vitesse = vitesse
-        self.image = image
-        self.pos = image.get_rect().move(x, hauteur)
+        self.vitesse = vitesse #Il s'agit de la vitesse de l'objet créé
+        self.image = image #il s'agit de l'image de l'objet créé
+        self.pos = image.get_rect().move(x, hauteur) #Il s'agit de la position de dpéart de l'objet
         
     def move(self):
         """cette fonction fait bouger l'objet auquel il est associé"""
-        self.pos = self.pos.move(0, self.vitesse)
+        self.pos = self.pos.move(0, self.vitesse)#on bouge l'objet de la valeur de vitesse pixels
