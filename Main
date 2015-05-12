@@ -28,7 +28,7 @@ while continuer==1:
     menu()
     
     #On initialise les variables à leur valeur de départ via le dossier Variable_init et la fonction Init()#
-    Vaisseau_rect,liste_tir,liste_mob,liste_shot,liste_rect_tir,liste_rect_mob,liste_rect_shot,vie,keys,timer,temps,tps_mob,tps_fastmob,tps_shooter,temps_depuis_derniere_mort,liste_rect_heal,liste_rect_shotspeedup,liste_rect_bombe,liste_bonus,liste_heal,liste_shotspeedup,liste_bombe,vitesse_tir,score=Init()
+    Vaisseau_rect,liste_tir,liste_mob,liste_shot,liste_rect_tir,liste_rect_mob,liste_rect_shot,vie,keys,timer,temps,tps_mob,tps_fastmob,tps_shooter,temps_depuis_derniere_mort,liste_rect_heal,liste_rect_shotspeedup,liste_rect_bombe,liste_bonus,liste_heal,liste_shotspeedup,liste_bombe,vitesse_tir,score,doubleshot,liste_doubleshot,liste_rect_doubleshot=Init()
 
     #Ceci est la boucle secondaire du programme. Une fois le jeu lancé, il continue tant que le joueur a des points de vie#
     while vie !=0:
@@ -37,6 +37,7 @@ while continuer==1:
             if event.type==QUIT:
                 pygame.quit() #Le jeu quitte si on appuie sur la croix rouge de la fenetre#
                 exit()
+                
             if event.type==KEYDOWN:
                 #Si une touche est enfoncée, on change les variables de la liste des input#
                 if event.key==K_a:
@@ -73,11 +74,24 @@ while continuer==1:
         if keys[2]:
             #On vérifie que le vaisseau n'aie pas tiré trop récemment avant de créer le tir#
             if pygame.time.get_ticks()>= temps+vitesse_tir:
+                if doubleshot == True:
+                    laser.play() #Joue le son du tir#
+                    temps=pygame.time.get_ticks() #Reset du temps de "cooldown" des tirs#
+                    #On crée le tir et on l'ajoute à la liste de coordonnées de tirs#
+                    o = objet(tir,736, -10,Vaisseau_rect.left +10)
+                    liste_tir.append(o)
+                    o=objet(tir,736,-10,Vaisseau_rect.left +45)
+                    liste_tir.append(o)
+                else:
+                
                     laser.play() #Joue le son du tir#
                     temps=pygame.time.get_ticks() #Reset du temps de "cooldown" des tirs#
                     #On crée le tir et on l'ajoute à la liste de coordonnées de tirs#
                     o = objet(tir,736, -10,Vaisseau_rect.left +32)
                     liste_tir.append(o)
+
+                
+                    
 
                     
                                         ###Spawn des mobs###
@@ -110,16 +124,19 @@ while continuer==1:
             #Spawn des bonus#
         for i in liste_bonus:
             #Quand un bonus est créé, il est choisi aléatoirement entre une vie, une bombe et une amélioration de tir#
-            random_bonus = randrange(1,10,1)
+            random_bonus = randrange(1,100,1)
             
-            if random_bonus <= 2:
+            if random_bonus <= 20:
                 k = objet(image_heal,i.top,6,i.left +13)
                 liste_heal.append(k)
                 
-            elif random_bonus <=4:
+            elif random_bonus <=40:
                 l = objet(image_shotspeedup,i.top,6,i.left +13)
                 liste_shotspeedup.append(l)
-                
+
+            elif random_bonus <= 60 and doubleshot ==False:
+                l =objet(image_doubleshot,i.top,6,i.left+13)
+                liste_doubleshot.append(l)
             else:
                 m = objet(image_bombe,i.top,6,i.left +13)
                 liste_bombe.append(m)
@@ -147,6 +164,8 @@ while continuer==1:
 
             #Mouvement des bonus bombes#
         liste_bombe,liste_rect_bombe,vie = Mouvement(liste_bombe,liste_rect_bombe,825,vie,False,True)
+             #Mouvement des bonus doubleshot#
+        liste_doubleshot,liste_rect_doubleshot,vie = Mouvement(liste_doubleshot,liste_rect_doubleshot,825,vie,False,True)  
 
                                       ###Calcul des Collisions###
             #On regarde si il y a collision entre le vaisseau et un tir ennemi , Si il y a collision, le tir ennemi est supprimé
@@ -180,6 +199,10 @@ while continuer==1:
             liste_rect_mob=[]
             liste_rect_shot=[]
             
+        liste_doubleshot,vie,collision,score = Collision(Vaisseau_rect,liste_rect_doubleshot,liste_doubleshot,vie,score)
+        if collision == True  :
+            doubleshot = True 
+            
         
                             ###On affiche les élements à l'écran###
             #On utilise la fonction Affichage (voir dossier Fonctions) pour afficher toutes les listes d'objets#
@@ -189,6 +212,7 @@ while continuer==1:
         Affichage(liste_heal)
         Affichage(liste_shotspeedup)
         Affichage(liste_bombe)
+        Affichage(liste_doubleshot)
 
             #On affiche les coeurs en fonctions du nombre de points de vie#
         if vie >= 3:
@@ -199,7 +223,7 @@ while continuer==1:
             fenetre.blit(heart, (530,780))
             
             #On affiche le score en haut à gauche#
-        font = pygame.font.Font(None, 40)
+        font = pygame.font.Font("font/munro.ttf", 40) #On sélectionne la police d'écriture
         ren = font.render(str (score),0,(255,255,255))
         fenetre.blit(ren, (5, 1))
 
