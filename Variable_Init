@@ -43,6 +43,9 @@ image_shot2=pygame.image.load("img/shooter_tir2.png").convert_alpha()
 image_shot2_rect=image_shot2.get_rect()
 
         #Chargement des sprites des bonus#
+image_doubleshot = pygame.image.load("img/doubleshot.png").convert()
+image_doubleshot_rect=image_doubleshot.get_rect()
+
 image_heal=pygame.image.load("img/coeur.png").convert()
 image_heal_rect=image_heal.get_rect()
 
@@ -71,6 +74,7 @@ liste_bonus = []
 liste_heal= []
 liste_shotspeedup=[]
 liste_bombe = []
+double_shot = False
 
         #Création de la liste des Hitbox des mobs et des tirs#
 liste_rect_tir=[]
