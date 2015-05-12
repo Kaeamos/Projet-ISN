@@ -136,7 +136,7 @@ def Affichage(liste):
 def Init():
     """Fonction qui remet les valeurs initiales des différents elements avant chaque partie"""
     #La fonction global permet à python d'aller chercher les valeurs dans tout le dossier#
-    global Vaisseau_rect,liste_tir,liste_mob,liste_shot,liste_rect_tir,liste_rect_mob,liste_rect_shot,vie,keys,timer,temps,tps_mob,tps_fastmob,tps_shooter,temps_depuis_derniere_mort,liste_rect_heal,liste_rect_shotspeedup,liste_rect_bombe,liste_bonus,liste_heal,liste_shotspeedup,liste_bombe,vitesse_tir,score
+    global Vaisseau_rect,liste_tir,liste_mob,liste_shot,liste_rect_tir,liste_rect_mob,liste_rect_shot,vie,keys,timer,temps,tps_mob,tps_fastmob,tps_shooter,temps_depuis_derniere_mort,liste_rect_heal,liste_rect_shotspeedup,liste_rect_bombe,liste_bonus,liste_heal,liste_shotspeedup,liste_bombe,vitesse_tir,score,doubleshot,liste_doubleshot,liste_rect_doubleshot
 
     #On réinitialise le vaisseau et on le réaffiche#
     Vaisseau_rect.left=268
@@ -155,11 +155,14 @@ def Init():
     liste_rect_heal =[]
     liste_rect_shotspeedup =[]
     liste_rect_bombe=[]
+    liste_rect_doubleshot = []
     
     liste_bonus = []
     liste_heal= []
     liste_shotspeedup=[]
     liste_bombe = []
+    liste_doubleshot = []
+    doubleshot = False
     
     #On remet le nombre de points de vie à 3#
     vie = 3
@@ -180,7 +183,7 @@ def Init():
     tps_shooter=pygame.time.get_ticks()
 
     #On renvoie toutes les valeurs initialisées au programme#
-    return Vaisseau_rect,liste_tir,liste_mob,liste_shot,liste_rect_tir,liste_rect_mob,liste_rect_shot,vie,keys,timer,temps,tps_mob,tps_fastmob,tps_shooter,temps_depuis_derniere_mort,liste_rect_heal,liste_rect_shotspeedup,liste_rect_bombe,liste_bonus,liste_heal,liste_shotspeedup,liste_bombe,vitesse_tir,score
+    return Vaisseau_rect,liste_tir,liste_mob,liste_shot,liste_rect_tir,liste_rect_mob,liste_rect_shot,vie,keys,timer,temps,tps_mob,tps_fastmob,tps_shooter,temps_depuis_derniere_mort,liste_rect_heal,liste_rect_shotspeedup,liste_rect_bombe,liste_bonus,liste_heal,liste_shotspeedup,liste_bombe,vitesse_tir,score,doubleshot,liste_doubleshot,liste_rect_doubleshot
 
 def highscore():
     """Cette fonction affiche les 10 meilleurs scores elle est appellée lorsqu'on sélectionne highscore dans le menu"""    
@@ -197,7 +200,7 @@ def highscore():
                  pass 
     
     score_lu=sorted(score_lu,reverse = True) #On trie par ordre décroissant les scores
-    font = pygame.font.Font(None, 40) #On sélectionne la police d'écriture
+    font = pygame.font.Font("font/munro.ttf", 40) #On sélectionne la police d'écriture
     
     
     o=0
@@ -210,6 +213,7 @@ def highscore():
         ren =font.render(texte,0,(255,255,255)) #On crée une image avec le texte
         fenetre.blit(ren, (20, 40*o)) #On affiche l'image
         o=o+1
+    font = pygame.font.Font("font/munro.ttf", 30) #On sélectionne la police d'écriture
     texte =font.render( " Appuyer sur espace pour revenir au menu" ,0,(255,255,255))
     fenetre.blit(texte,(10,40*11))                   
     pygame.display.update()
@@ -224,7 +228,7 @@ def saveScore(score):
     """Cette fonction sauvegarde le score du jouer à la fin d'une partie et détermine son rang"""
     fichier = open("score.txt","r+")#On ouvre le fichier des scores
     score_lu=[]
-    font = pygame.font.Font(None, 60)#On sélectionne la police d'écriture
+    font = pygame.font.Font("font/munro.ttf", 60) #On sélectionne la police d'écriture
     for line in fichier: #On parcoure le fichier
        if line.strip(): # On détecte si il s'agit d'une nouvelle ligne dans le fichier          
            try:
